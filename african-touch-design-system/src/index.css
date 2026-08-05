@@ -1,0 +1,84 @@
+@import "tailwindcss";
+
+@theme {
+  /* Brand palette */
+  --color-safari: #4F2607;
+  --color-safari-50: rgba(79, 38, 7, 0.5);
+  --color-safari-75: rgba(79, 38, 7, 0.75);
+  --color-safari-30: rgba(79, 38, 7, 0.3);
+  --color-navy: #112337;
+  --color-terracotta: #FF5A1F;
+  --color-taupe: #87674F;
+
+  /* Interactive */
+  --color-cobalt: #204CE5;
+  --color-ocean: #044AD3;
+
+  /* Neutrals */
+  --color-offwhite: #F2F3F5;
+  --color-palegray: #EEEEEE;
+  --color-stonegray: #E5E7EB;
+  --color-medgray: #D2D5DB;
+  --color-slate: #585E6A;
+  --color-dimgray: #686E77;
+
+  /* Status */
+  --color-success: #399F4B;
+  --color-warning: #FCB900;
+  --color-error: #C02B0A;
+
+  /* Typography */
+  --font-serif: "Amiri", Georgia, "Times New Roman", serif;
+  --font-sans: "Montserrat", "Helvetica Neue", Arial, sans-serif;
+  --font-helvetica: "Helvetica", "Helvetica Neue", Arial, sans-serif;
+
+  /* Shadows (per design system) */
+  --shadow-card: 6.5px 11.3px 19px 0px rgba(0, 0, 0, 0.11);
+  --shadow-card-hover: 0px 10px 20px 0px rgba(0, 0, 0, 0.19),
+    0px 6px 6px 0px rgba(0, 0, 0, 0.23);
+  --shadow-sticky: 0px 2px 4px 0px rgba(0, 0, 0, 0.08);
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font-sans);
+  color: var(--color-safari);
+  background-color: #ffffff;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.font-serif {
+  font-family: var(--font-serif);
+}
+
+.font-helvetica {
+  font-family: var(--font-helvetica);
+}
+
+/* Subtle fade-in for hero */
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-up {
+  animation: fadeUp 900ms ease-out both;
+}
+
+.animate-fade-up-delay {
+  animation: fadeUp 900ms ease-out 250ms both;
+}
+
+.animate-fade-up-delay-2 {
+  animation: fadeUp 900ms ease-out 500ms both;
+}
