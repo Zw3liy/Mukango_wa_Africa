@@ -1,0 +1,9 @@
+# Local dependencies and Vite build output
+node_modules/
+dist/
+
+# Package-manager diagnostics
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
