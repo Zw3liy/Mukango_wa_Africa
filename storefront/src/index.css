@@ -1,0 +1,95 @@
+@import "tailwindcss";
+
+@theme {
+  /* Brand color palette */
+  --color-brand-safari: #4F2607;
+  --color-brand-safari-light: #6E3B13;
+  --color-brand-teak: #8B6F47;
+  --color-brand-teak-light: #A88B63;
+  --color-brand-oak: #D4B896;
+  --color-brand-oak-light: #EFE6DA;
+  --color-brand-cream: #FAF9F6;
+  --color-brand-warm-white: #F7F5F0;
+  --color-brand-charcoal: #2D2A26;
+  --color-brand-ebony: #1A1715;
+  --color-brand-terracotta: #C86D3B;
+  --color-brand-ochre: #D97706;
+
+  /* Typography */
+  --font-serif: "Amiri", "Cormorant Garamond", Georgia, serif;
+  --font-display: "Cormorant Garamond", "Amiri", Georgia, serif;
+  --font-sans: "Inter", "Montserrat", system-ui, -apple-system, sans-serif;
+
+  /* Shadows */
+  --shadow-subtle: 0 2px 8px rgba(45, 42, 38, 0.04);
+  --shadow-card: 0 10px 30px -10px rgba(45, 42, 38, 0.08);
+  --shadow-card-hover: 0 20px 40px -15px rgba(45, 42, 38, 0.15);
+  --shadow-drawer: -4px 0 24px rgba(45, 42, 38, 0.15);
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    font-family: var(--font-sans);
+    color: var(--color-brand-charcoal);
+    background-color: var(--color-brand-cream);
+  }
+
+  body {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow-x: hidden;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-serif);
+    letter-spacing: -0.01em;
+  }
+
+  ::selection {
+    background-color: #8B6F47;
+    color: #FAF9F6;
+  }
+}
+
+/* Custom scrollbars */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #F7F5F0;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #D4B896;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #8B6F47;
+}
+
+/* Custom animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.4s ease-out forwards;
+}
+
+/* Focus styles for keyboard accessibility */
+:focus-visible {
+  outline: 2px solid #8B6F47;
+  outline-offset: 2px;
+}
