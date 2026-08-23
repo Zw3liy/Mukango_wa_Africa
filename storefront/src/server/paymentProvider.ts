@@ -1,6 +1,7 @@
 import crypto from "crypto";
 import { OrderRecord } from "../types/order";
 import { PaymentMethod } from "../types/commerce";
+import { orderStore } from "./orderStore";
 
 export interface PaymentCreationResult {
   success: boolean;
@@ -28,9 +29,6 @@ export interface WebhookVerificationResult {
   error?: string;
 }
 
-// In-memory idempotency store for processed webhook IDs
-const PROCESSED_WEBHOOK_EVENTS = new Set<string>();
-
 export class PaymentProviderManager {
   /**
    * Checks if a provider has all required production credentials in the environment.
@@ -38,6 +36,12 @@ export class PaymentProviderManager {
   public static getProviderStatus(): Record<PaymentMethod, { available: boolean; reason?: string }> {
     const hasStripe = Boolean(process.env.STRIPE_SECRET_KEY && process.env.STRIPE_SECRET_KEY.startsWith("sk_"));
     const hasPayFast = Boolean(process.env.PAYFAST_MERCHANT_ID && process.env.PAYFAST_MERCHANT_KEY);
+    const hasBankWire = Boolean(
+      process.env.BANK_NAME &&
+      process.env.BANK_ACCOUNT_NAME &&
+      process.env.BANK_ACCOUNT_NUMBER &&
+      process.env.BANK_SWIFT_CODE
+    );
 
     return {
       stripe: {
@@ -49,12 +53,16 @@ export class PaymentProviderManager {
         reason: hasPayFast ? undefined : "PAYFAST_MERCHANT_ID or PAYFAST_MERCHANT_KEY is not configured.",
       },
       wire_transfer: {
-        available: true,
-        reason: undefined,
+        available: hasBankWire,
+        reason: hasBankWire
+          ? undefined
+          : "Bank wire instructions are unconfigured. Required variables: BANK_NAME, BANK_ACCOUNT_NAME, BANK_ACCOUNT_NUMBER, BANK_SWIFT_CODE.",
       },
       bespoke_invoice: {
-        available: true,
-        reason: undefined,
+        available: hasBankWire,
+        reason: hasBankWire
+          ? undefined
+          : "Bank wire instructions are unconfigured. Required variables: BANK_NAME, BANK_ACCOUNT_NAME, BANK_ACCOUNT_NUMBER, BANK_SWIFT_CODE.",
       },
     };
   }
@@ -68,6 +76,7 @@ export class PaymentProviderManager {
   ): Promise<PaymentCreationResult> {
     const { method } = order.payment;
     const amountDue = order.pricing.total;
+    const currency = (order.pricing.currency || "USD").toLowerCase();
 
     // Validate amount
     if (amountDue <= 0 || isNaN(amountDue)) {
@@ -76,6 +85,16 @@ export class PaymentProviderManager {
         isConfigured: true,
         provider: method,
         errorMessage: "Invalid order amount. Amount must be greater than zero.",
+      };
+    }
+
+    // Validate currency format
+    if (!/^[a-z]{3}$/.test(currency)) {
+      return {
+        success: false,
+        isConfigured: true,
+        provider: method,
+        errorMessage: `Invalid currency code '${order.pricing.currency}' for payment processing.`,
       };
     }
 
@@ -90,7 +109,7 @@ export class PaymentProviderManager {
         };
       }
 
-      // If Stripe credentials are present, invoke Stripe Checkout Session creation
+      // If Stripe credentials are present, invoke Stripe Checkout Session creation with authoritative currency
       try {
         const response = await fetch("https://api.stripe.com/v1/checkout/sessions", {
           method: "POST",
@@ -99,13 +118,13 @@ export class PaymentProviderManager {
             "Content-Type": "application/x-www-form-urlencoded",
           },
           body: new URLSearchParams({
-            "client_reference_id": order.id,
+            "client_reference_id": order.reference,
             "success_url": `${siteBaseUrl}/checkout/confirmation?ref=${order.reference}`,
             "cancel_url": `${siteBaseUrl}/checkout/cancel?ref=${order.reference}`,
             "payment_method_types[0]": "card",
             "mode": "payment",
             "customer_email": order.customer.email,
-            "line_items[0][price_data][currency]": "usd",
+            "line_items[0][price_data][currency]": currency,
             "line_items[0][price_data][product_data][name]": `Mukango Wa Africa Order #${order.id}`,
             "line_items[0][price_data][unit_amount]": Math.round(amountDue * 100).toString(),
             "line_items[0][quantity]": "1",
@@ -178,19 +197,33 @@ export class PaymentProviderManager {
     }
 
     if (method === "wire_transfer" || method === "bespoke_invoice") {
-      // Official Pro-Forma Bank Wire instructions
+      // Configuration-driven bank details: NO FABRICATED VALUES
+      const bankName = process.env.BANK_NAME;
+      const accountName = process.env.BANK_ACCOUNT_NAME;
+      const accountNumber = process.env.BANK_ACCOUNT_NUMBER;
+      const swiftCode = process.env.BANK_SWIFT_CODE;
+
+      if (!bankName || !accountName || !accountNumber || !swiftCode) {
+        return {
+          success: false,
+          isConfigured: false,
+          provider: method,
+          errorMessage: "Bank wire instructions are not configured in server environment. Required variables: BANK_NAME, BANK_ACCOUNT_NAME, BANK_ACCOUNT_NUMBER, BANK_SWIFT_CODE.",
+        };
+      }
+
       return {
         success: true,
         isConfigured: true,
         provider: method,
         sessionReference: `INV-${order.id}`,
         invoiceInstructions: {
-          bankName: "First National Bank Zambia (FNB) / Standard Chartered Lusaka",
-          accountName: "Mukango Wa Africa Artisans Ltd",
-          accountNumber: "6289-4019-2041",
-          swiftCode: "FIRNZMLX",
+          bankName,
+          accountName,
+          accountNumber,
+          swiftCode,
           reference: `ORD-${order.id}`,
-          amountDue: `$${amountDue.toLocaleString("en-US", { minimumFractionDigits: 2 })} USD`,
+          amountDue: `${order.pricing.currency} ${amountDue.toLocaleString("en-US", { minimumFractionDigits: 2 })}`,
         },
       };
     }
@@ -204,13 +237,13 @@ export class PaymentProviderManager {
   }
 
   /**
-   * Handles webhook verification with strict HMAC signature & idempotency checking.
+   * Handles webhook verification with strict HMAC signature & durable idempotency checking.
    */
-  public static verifyWebhookEvent(
+  public static async verifyWebhookEvent(
     provider: PaymentMethod,
     rawPayload: string,
     signatureHeader: string | undefined
-  ): WebhookVerificationResult {
+  ): Promise<WebhookVerificationResult> {
     if (!rawPayload) {
       return { verified: false, isDuplicate: false, error: "Empty webhook payload." };
     }
@@ -277,7 +310,19 @@ export class PaymentProviderManager {
         const event = JSON.parse(rawPayload);
         const eventId = event.id;
 
-        if (PROCESSED_WEBHOOK_EVENTS.has(eventId)) {
+        // Durable idempotency check
+        let isDuplicate = false;
+        try {
+          isDuplicate = await orderStore.hasProcessedWebhookEvent(eventId);
+        } catch (idempotencyErr) {
+          return {
+            verified: false,
+            isDuplicate: false,
+            error: idempotencyErr instanceof Error ? idempotencyErr.message : "Failed to verify durable webhook idempotency.",
+          };
+        }
+
+        if (isDuplicate) {
           return {
             verified: true,
             isDuplicate: true,
@@ -286,7 +331,8 @@ export class PaymentProviderManager {
           };
         }
 
-        PROCESSED_WEBHOOK_EVENTS.add(eventId);
+        // Record in durable store
+        await orderStore.recordWebhookEvent(eventId, "stripe", { type: event.type });
 
         const paymentStatus = event.type === "checkout.session.completed" ? "paid" : "pending";
         return {

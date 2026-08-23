@@ -1,9 +1,19 @@
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, beforeEach, afterEach } from "vitest";
 import { processCheckoutSession } from "../src/server/checkoutService";
-import { orderStore } from "../src/server/orderStore";
+import { orderStore, ProductionOrderStore } from "../src/server/orderStore";
 import { PaymentProviderManager } from "../src/server/paymentProvider";
 
 describe("Checkout Boundary & Order Persistence", () => {
+  const originalEnv = { ...process.env };
+
+  beforeEach(() => {
+    process.env = { ...originalEnv, ALLOW_TEST_MEMORY_STORE: "true" };
+  });
+
+  afterEach(() => {
+    process.env = originalEnv;
+  });
+
   it("validates required customer and shipping address fields", async () => {
     const invalidRes = await processCheckoutSession(
       {
@@ -19,7 +29,44 @@ describe("Checkout Boundary & Order Persistence", () => {
     expect(invalidRes.errorMessage).toBeDefined();
   });
 
-  it("creates bank wire pro-forma invoice session successfully and persists order", async () => {
+  it("fails explicitly when bank wire instructions are unconfigured in environment (No fabricated details)", async () => {
+    delete process.env.BANK_NAME;
+    delete process.env.BANK_ACCOUNT_NAME;
+    delete process.env.BANK_ACCOUNT_NUMBER;
+    delete process.env.BANK_SWIFT_CODE;
+
+    const res = await processCheckoutSession(
+      {
+        items: [{ productId: "mwa-savannah-throned-chair", quantity: 1, finishId: "natural-wax" }],
+        customer: {
+          firstName: "Amelia",
+          lastName: "Duarte",
+          email: "amelia.duarte@example.com",
+          phone: "+351 912 345 678",
+        },
+        shippingAddress: {
+          streetLine1: "Avenida da Liberdade 120",
+          city: "Lisbon",
+          stateProvince: "Lisbon",
+          postalCode: "1250-142",
+          country: "Portugal",
+        },
+        paymentMethod: "wire_transfer",
+      },
+      "https://mukangowaafrica.com"
+    );
+
+    expect(res.status).toBe("config_error");
+    expect(res.errorMessage).toContain("BANK_NAME");
+    expect(res.invoiceInstructions).toBeUndefined();
+  });
+
+  it("creates bank wire pro-forma invoice session when configured with official bank details", async () => {
+    process.env.BANK_NAME = "Stanbic Bank Zambia";
+    process.env.BANK_ACCOUNT_NAME = "Mukango Wa Africa Artisans";
+    process.env.BANK_ACCOUNT_NUMBER = "913000482910";
+    process.env.BANK_SWIFT_CODE = "SBICZMLX";
+
     const validRes = await processCheckoutSession(
       {
         items: [{ productId: "mwa-savannah-throned-chair", quantity: 1, finishId: "natural-wax" }],
@@ -45,7 +92,8 @@ describe("Checkout Boundary & Order Persistence", () => {
     expect(validRes.orderId).toMatch(/^MWA-/);
     expect(validRes.reference).toBeDefined();
     expect(validRes.invoiceInstructions).toBeDefined();
-    expect(validRes.invoiceInstructions?.swiftCode).toBe("FIRNZMLX");
+    expect(validRes.invoiceInstructions?.swiftCode).toBe("SBICZMLX");
+    expect(validRes.invoiceInstructions?.amountDue).toContain("USD");
 
     // Verify order was saved into orderStore
     const retrieved = await orderStore.getOrderByReference(validRes.reference);
@@ -82,11 +130,21 @@ describe("Checkout Boundary & Order Persistence", () => {
     expect(res.errorMessage).toContain("STRIPE_SECRET_KEY");
   });
 
-  it("checks provider status accurately", () => {
+  it("reports database configuration readiness honestly", () => {
+    delete process.env.DATABASE_URL;
+    const dbStatus = ProductionOrderStore.isDatabaseConfigured();
+    expect(dbStatus.configured).toBe(false);
+    expect(dbStatus.message).toContain("DATABASE_URL is not configured");
+  });
+
+  it("checks provider status accurately based on configuration", () => {
+    delete process.env.STRIPE_SECRET_KEY;
+    delete process.env.PAYFAST_MERCHANT_ID;
+    delete process.env.BANK_NAME;
+
     const status = PaymentProviderManager.getProviderStatus();
-    expect(status.wire_transfer.available).toBe(true);
-    expect(status.bespoke_invoice.available).toBe(true);
-    expect(typeof status.stripe.available).toBe("boolean");
-    expect(typeof status.payfast.available).toBe("boolean");
+    expect(status.stripe.available).toBe(false);
+    expect(status.payfast.available).toBe(false);
+    expect(status.wire_transfer.available).toBe(false);
   });
 });

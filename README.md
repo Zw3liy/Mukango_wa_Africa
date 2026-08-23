@@ -13,11 +13,12 @@ This repository contains the canonical production storefront for **Mukango Wa Af
 - **Narrative Design Motifs:** The Savannah Collection, Village Stories, Big Five Icons, Traditional Royal Court, and Zambezi River Flow.
 - **Indigenous Timber Registry:** Detailed botanical profiles, hardness ratings, and finishing specifications for Zambezi Teak (*Baikiaea plurijuga*), Mukwa/Kiaat (*Pterocarpus angolensis*), and African Blackwood (*Dalbergia melanoxylon*).
 - **Server-Authoritative Commerce Boundaries:** Typed boundaries for cart validation, pricing calculations, crated freight estimation, order persistence, and checkout.
-- **No Fake Commerce:** Strict payment provider abstraction (Stripe, PayFast, SWIFT Bank Wire) and email delivery provider (Resend) that fail safely and explicitly report missing credentials without fabricating orders or transactions.
+- **No Fake Commerce:** Strict payment provider abstraction (Stripe, PayFast, SWIFT Bank Wire) and email delivery provider (Resend) that fail safely and explicitly report missing credentials without fabricating orders, bank details, or transactions.
+- **Durable Order & Webhook Store:** PostgreSQL adapter for durable order persistence and webhook idempotency tracking with fail-closed security when unconfigured.
 - **Bespoke Commissions & Atelier Walkthroughs:** Full interactive customizer, room dimension specifications, and direct consultations with Founder & Master Craftsman Chiwama Kennedy Daka.
 - **25-Year Heirloom Warranty & Phytosanitary Export:** Detailed global logistics protocols with ISPM-15 certified wooden crating.
 - **Search Engine Optimization:** Dynamic OpenGraph metadata, Twitter cards, Product JSON-LD, Breadcrumb JSON-LD, Organization JSON-LD, `robots.txt`, and authoritative `sitemap.xml` strictly excluding private cart/checkout routes.
-- **Security:** CSP headers, CORS origin verification, HMAC webhook signatures, input sanitization, rate limiting, and honeypot spam protection.
+- **Security:** CSP headers, CORS origin allowlist applied to all endpoints & preflight requests, HMAC webhook signatures, input sanitization, rate limiting, and honeypot spam protection.
 
 ---
 
@@ -26,6 +27,8 @@ This repository contains the canonical production storefront for **Mukango Wa Af
 ```
 .
 ├── storefront/                  # Canonical customer-facing production application
+│   ├── netlify/
+│   │   └── functions/           # Netlify serverless function entry points (api.ts)
 │   ├── public/                  # Static assets (favicons, robots.txt, images)
 │   ├── scripts/                 # Build scripts (sitemap generator)
 │   ├── src/
@@ -42,7 +45,6 @@ This repository contains the canonical production storefront for **Mukango Wa Af
 │   ├── tsconfig.json            # TypeScript configuration
 │   └── vite.config.ts           # Vite bundler & dev API server middleware
 ├── netlify.toml                 # Root deployment configuration
-├── .github/workflows/ci.yml     # Automated GitHub Actions CI pipeline
 └── README.md                    # Project documentation
 ```
 
@@ -87,18 +89,24 @@ Create `.env` in `storefront/` (see `storefront/.env.example`):
 | Variable | Description |
 |---|---|
 | `SITE_URL` | Canonical production domain (e.g. `https://mukangowaafrica.com`) |
+| `DEFAULT_CURRENCY` | Authoritative base currency code (default: `USD`) |
+| `DATABASE_URL` | PostgreSQL connection string for durable order & webhook persistence |
 | `STRIPE_SECRET_KEY` | Stripe secret key for live card checkout (`sk_live_...`) |
 | `STRIPE_WEBHOOK_SECRET` | Stripe webhook signing secret (`whsec_...`) |
 | `PAYFAST_MERCHANT_ID` | PayFast Merchant ID for South African EFT/cards |
 | `PAYFAST_MERCHANT_KEY` | PayFast Merchant Key |
 | `PAYFAST_PASSPHRASE` | PayFast Security Passphrase |
+| `BANK_NAME` | Official beneficiary bank name for wire payments |
+| `BANK_ACCOUNT_NAME` | Official corporate account name |
+| `BANK_ACCOUNT_NUMBER` | Official bank account number |
+| `BANK_SWIFT_CODE` | Official SWIFT/BIC routing code |
 | `RESEND_API_KEY` | API Key for transactional email delivery |
 | `CONTACT_RECEIVER_EMAIL` | Recipient email address for contact and bespoke requests |
-| `DATABASE_URL` | PostgreSQL / durable database connection string |
 
 ---
 
 ## 5. Security & Deployment
 
+- **Serverless API Function:** Netlify serverless entry point at `netlify/functions/api.ts` maps directly to `apiRouter.ts`.
 - **Headers:** Content Security Policy, X-Frame-Options (`DENY`), X-Content-Type-Options (`nosniff`), Strict-Transport-Security, and Referrer-Policy configured via `netlify.toml` and `public/_headers`.
 - **Sitemap & Robots:** Private routes (`/cart`, `/checkout`, `/api/`) are excluded from `sitemap.xml` and disallowed in `robots.txt`.

@@ -1,6 +1,8 @@
+import type { HandlerEvent, HandlerContext } from "@netlify/functions";
 import { describe, it, expect } from "vitest";
 import { handleApiRequest } from "../src/server/apiRouter";
 import { orderStore } from "../src/server/orderStore";
+import { handler as netlifyHandler } from "../netlify/functions/api";
 
 describe("Server API Boundaries & Routing", () => {
   it("GET /api/health returns 200 with service info", async () => {
@@ -69,7 +71,7 @@ describe("Server API Boundaries & Routing", () => {
     expect(foundBody.order.id).toBe("MWA-2026-9999");
   });
 
-  it("handles CORS preflight OPTIONS requests gracefully", async () => {
+  it("handles CORS preflight OPTIONS requests securely for permitted origin", async () => {
     const res = await handleApiRequest({
       method: "OPTIONS",
       pathname: "/api/cart/validate",
@@ -79,6 +81,38 @@ describe("Server API Boundaries & Routing", () => {
 
     expect(res.status).toBe(204);
     expect(res.headers["Access-Control-Allow-Origin"]).toBe("https://mukangowaafrica.com");
+  });
+
+  it("rejects CORS preflight OPTIONS requests from forbidden origins (403 Forbidden)", async () => {
+    const res = await handleApiRequest({
+      method: "OPTIONS",
+      pathname: "/api/cart/validate",
+      searchParams: new URLSearchParams(),
+      headers: { origin: "https://malicious-phishing-site.com" },
+    });
+
+    expect(res.status).toBe(403);
+  });
+
+  it("executes Netlify serverless function entrypoint successfully", async () => {
+    const netlifyEvent: HandlerEvent = {
+      rawUrl: "https://mukangowaafrica.com/.netlify/functions/api/health",
+      rawQuery: "",
+      path: "/.netlify/functions/api/health",
+      httpMethod: "GET",
+      headers: { host: "mukangowaafrica.com" },
+      multiValueHeaders: {},
+      queryStringParameters: {},
+      multiValueQueryStringParameters: {},
+      body: null,
+      isBase64Encoded: false,
+    };
+
+    const netlifyRes = await netlifyHandler(netlifyEvent, {} as HandlerContext);
+    expect(netlifyRes).toBeDefined();
+    expect(netlifyRes?.statusCode).toBe(200);
+    const parsed = JSON.parse(netlifyRes?.body || "{}");
+    expect(parsed.status).toBe("healthy");
   });
 
   it("rejects oversized request bodies (413 Payload Too Large)", async () => {

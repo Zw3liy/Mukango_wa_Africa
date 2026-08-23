@@ -1,14 +1,16 @@
 import { ApiServerRequest, ApiServerResponse } from "../types/api";
 import { validateCartServerSide } from "./cartValidator";
 import { processCheckoutSession } from "./checkoutService";
-import { orderStore } from "./orderStore";
+import { orderStore, ProductionOrderStore } from "./orderStore";
 import { PaymentProviderManager } from "./paymentProvider";
 import { handleContactFormSubmission, handleBespokeFormSubmission, handleNewsletterSubmission } from "./formHandler";
 import { validateOrigin, enforcePayloadSizeLimit } from "./security";
 import { globalRateLimiter } from "./rateLimiter";
 
 function jsonResponse(status: number, data: unknown, originHeader?: string): ApiServerResponse {
-  const allowedOrigin = originHeader || "*";
+  const isAllowed = validateOrigin(originHeader);
+  const allowedOrigin = isAllowed && originHeader ? originHeader : "https://mukangowaafrica.com";
+
   return {
     status,
     headers: {
@@ -17,6 +19,7 @@ function jsonResponse(status: number, data: unknown, originHeader?: string): Api
       "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
       "Access-Control-Allow-Headers": "Content-Type, Authorization, Stripe-Signature",
       "X-Content-Type-Options": "nosniff",
+      "Vary": "Origin",
     },
     body: JSON.stringify(data),
   };
@@ -28,23 +31,32 @@ export async function handleApiRequest(req: ApiServerRequest): Promise<ApiServer
     ? req.headers["x-forwarded-for"][0]
     : req.headers["x-forwarded-for"] || "127.0.0.1";
 
-  // Handle CORS preflight
+  // Strict CORS origin check for ALL requests including OPTIONS preflight
+  const isOriginPermitted = validateOrigin(originHeader);
+  if (!isOriginPermitted) {
+    return {
+      status: 403,
+      headers: {
+        "Content-Type": "application/json",
+        "X-Content-Type-Options": "nosniff",
+      },
+      body: JSON.stringify({ error: "Forbidden: Origin not permitted." }),
+    };
+  }
+
+  // Handle CORS preflight for permitted origins
   if (req.method === "OPTIONS") {
     return {
       status: 204,
       headers: {
-        "Access-Control-Allow-Origin": originHeader || "*",
+        "Access-Control-Allow-Origin": originHeader || "https://mukangowaafrica.com",
         "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
         "Access-Control-Allow-Headers": "Content-Type, Authorization, Stripe-Signature",
         "Access-Control-Max-Age": "86400",
+        "Vary": "Origin",
       },
       body: "",
     };
-  }
-
-  // Security checks
-  if (!validateOrigin(originHeader)) {
-    return jsonResponse(403, { error: "Forbidden: Origin not permitted." }, originHeader);
   }
 
   if (!enforcePayloadSizeLimit(req.rawBody)) {
@@ -61,7 +73,7 @@ export async function handleApiRequest(req: ApiServerRequest): Promise<ApiServer
   // --- GET /api/health ---
   if (pathname === "/api/health" && req.method === "GET") {
     const paymentStatus = PaymentProviderManager.getProviderStatus();
-    const dbStatus = orderStore ? { ok: true } : { ok: false };
+    const dbStatus = ProductionOrderStore.isDatabaseConfigured();
     return jsonResponse(200, {
       status: "healthy",
       service: "Mukango Wa Africa Storefront API",
@@ -123,7 +135,7 @@ export async function handleApiRequest(req: ApiServerRequest): Promise<ApiServer
       ? req.headers["stripe-signature"][0]
       : req.headers["stripe-signature"];
 
-    const verification = PaymentProviderManager.verifyWebhookEvent("stripe", req.rawBody || "", signature);
+    const verification = await PaymentProviderManager.verifyWebhookEvent("stripe", req.rawBody || "", signature);
 
     if (!verification.verified) {
       return jsonResponse(400, { error: verification.error || "Webhook verification failed." }, originHeader);

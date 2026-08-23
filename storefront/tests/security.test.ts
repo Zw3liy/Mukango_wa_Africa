@@ -1,10 +1,20 @@
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, beforeEach, afterEach } from "vitest";
 import { escapeHtml, sanitizeText, isValidEmail, isValidPhone } from "../src/utils/sanitize";
 import { validateOrigin, enforcePayloadSizeLimit } from "../src/server/security";
 import { PaymentProviderManager } from "../src/server/paymentProvider";
 import crypto from "crypto";
 
 describe("Security, Sanitization & Webhook Integrity", () => {
+  const originalEnv = { ...process.env };
+
+  beforeEach(() => {
+    process.env = { ...originalEnv, ALLOW_TEST_MEMORY_STORE: "true" };
+  });
+
+  afterEach(() => {
+    process.env = originalEnv;
+  });
+
   it("escapes malicious HTML & script tags", () => {
     const malicious = '<script>alert("XSS")</script><img src="x" onerror="alert(1)">';
     const escaped = escapeHtml(malicious);
@@ -45,12 +55,13 @@ describe("Security, Sanitization & Webhook Integrity", () => {
     expect(enforcePayloadSizeLimit("a".repeat(2000), 1024)).toBe(false);
   });
 
-  it("enforces webhook HMAC signature verification and timestamp tolerances", () => {
+  it("enforces webhook HMAC signature verification and durable idempotency", async () => {
     const secret = "test_webhook_secret_key_12345";
     process.env.STRIPE_WEBHOOK_SECRET = secret;
 
+    const eventId = `evt_test_${Date.now()}`;
     const payload = JSON.stringify({
-      id: "evt_test_123456",
+      id: eventId,
       type: "checkout.session.completed",
       data: { object: { client_reference_id: "order_ref_1" } },
     });
@@ -59,18 +70,18 @@ describe("Security, Sanitization & Webhook Integrity", () => {
     const signature = crypto.createHmac("sha256", secret).update(`${timestamp}.${payload}`).digest("hex");
     const header = `t=${timestamp},v1=${signature}`;
 
-    const verified = PaymentProviderManager.verifyWebhookEvent("stripe", payload, header);
+    const verified = await PaymentProviderManager.verifyWebhookEvent("stripe", payload, header);
     expect(verified.verified).toBe(true);
     expect(verified.isDuplicate).toBe(false);
-    expect(verified.eventId).toBe("evt_test_123456");
+    expect(verified.eventId).toBe(eventId);
 
-    // Test duplicate detection
-    const duplicateCheck = PaymentProviderManager.verifyWebhookEvent("stripe", payload, header);
+    // Test durable duplicate detection
+    const duplicateCheck = await PaymentProviderManager.verifyWebhookEvent("stripe", payload, header);
     expect(duplicateCheck.isDuplicate).toBe(true);
 
     // Test tampering
     const tamperedPayload = payload + " ";
-    const badVerify = PaymentProviderManager.verifyWebhookEvent("stripe", tamperedPayload, header);
+    const badVerify = await PaymentProviderManager.verifyWebhookEvent("stripe", tamperedPayload, header);
     expect(badVerify.verified).toBe(false);
   });
 });

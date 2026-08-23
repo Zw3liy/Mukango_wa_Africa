@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { SEO } from "../components/common/SEO";
 import { Button } from "../components/common/Button";
 import { OrderRecord } from "../types/order";
-import { CheckCircle2, Building2, Copy, Check, Printer } from "lucide-react";
+import { CheckCircle2, Building2, Printer, FileText, Mail } from "lucide-react";
 import { formatPrice } from "../utils/currency";
 
 interface OrderConfirmationPageProps {
@@ -17,7 +17,6 @@ export const OrderConfirmationPage: React.FC<OrderConfirmationPageProps> = ({
   onNavigate,
 }) => {
   const [order, setOrder] = useState<OrderRecord | null>(null);
-  const [copiedField, setCopiedField] = useState<string | null>(null);
 
   const activeRef = reference || (typeof window !== "undefined" ? new URLSearchParams(window.location.search).get("ref") : null);
   const activeOrderId = orderId || (typeof window !== "undefined" ? new URLSearchParams(window.location.search).get("orderId") : null);
@@ -44,13 +43,7 @@ export const OrderConfirmationPage: React.FC<OrderConfirmationPageProps> = ({
     fetchOrder();
   }, [activeRef]);
 
-  const copyToClipboard = (text: string, fieldId: string) => {
-    navigator.clipboard.writeText(text);
-    setCopiedField(fieldId);
-    setTimeout(() => setCopiedField(null), 2000);
-  };
-
-  const displayOrderId = order?.id || activeOrderId || "MWA-2026-7782";
+  const displayOrderId = order?.id || activeOrderId || "Pending Reference";
 
   return (
     <div className="py-16 bg-[#FAF9F6] min-h-screen">
@@ -81,66 +74,51 @@ export const OrderConfirmationPage: React.FC<OrderConfirmationPageProps> = ({
             Order ID: <strong>{displayOrderId}</strong>
           </div>
 
-          {/* Pro-Forma Wire Instructions Box */}
+          {/* Wire Instructions / Pro-Forma Notice Box */}
           <div className="text-left bg-[#FAF9F6] p-6 sm:p-8 rounded border border-[#D4B896]/40 mb-8 space-y-4">
             <div className="flex items-center gap-2 pb-3 border-b border-[#D4B896]/30">
               <Building2 className="w-5 h-5 text-[#8B6F47]" />
               <h3 className="font-serif text-lg text-[#4F2607] font-normal">
-                SWIFT International Bank Wire Instructions
+                Payment & Pro-Forma Invoicing
               </h3>
             </div>
 
-            <p className="text-xs font-light text-stone-600">
-              Please execute your bank wire transfer referencing your Order ID. Once funds clear into our primary treasury account, our woodcarvers begin timber selection.
-            </p>
+            {order?.payment.method === "wire_transfer" || order?.payment.method === "bespoke_invoice" ? (
+              <div className="space-y-4">
+                <div className="flex items-start gap-3 p-4 bg-white rounded border border-stone-200 text-xs text-stone-700 leading-relaxed">
+                  <FileText className="w-5 h-5 text-[#8B6F47] shrink-0 mt-0.5" />
+                  <div>
+                    <strong className="font-medium text-[#4F2607] block mb-1">Official Pro-Forma Invoice</strong>
+                    <p>
+                      An official commercial pro-forma invoice with verified banking coordinates and phytosanitary export documentation is issued directly for this commission.
+                    </p>
+                  </div>
+                </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
-              <div className="p-3 bg-white rounded border border-stone-200 flex justify-between items-center">
-                <div>
-                  <span className="text-stone-400 block text-[10px] uppercase">Bank Name</span>
-                  <span className="font-medium text-[#2D2A26]">First National Bank Zambia (FNB)</span>
+                <div className="flex items-start gap-3 p-4 bg-white rounded border border-stone-200 text-xs text-stone-700 leading-relaxed">
+                  <Mail className="w-5 h-5 text-[#8B6F47] shrink-0 mt-0.5" />
+                  <div>
+                    <strong className="font-medium text-[#4F2607] block mb-1">Atelier Coordination</strong>
+                    <p>
+                      Our sales director will contact you at <code>{order.customer.email}</code> within 24 hours to confirm timber grain selections and wire transmission verification.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="p-3 bg-amber-50 rounded border border-amber-200 text-xs text-amber-900">
+                  <strong>Order Reference:</strong> <code>{displayOrderId}</code>
                 </div>
               </div>
-
-              <div className="p-3 bg-white rounded border border-stone-200 flex justify-between items-center">
-                <div>
-                  <span className="text-stone-400 block text-[10px] uppercase">Beneficiary Account</span>
-                  <span className="font-medium text-[#2D2A26]">Mukango Wa Africa Artisans Ltd</span>
+            ) : (
+              <div className="space-y-2 text-xs font-light text-stone-600">
+                <p>
+                  Payment status is verified directly through our certified payment gateway.
+                </p>
+                <div className="p-3 bg-stone-50 rounded border border-stone-200">
+                  <strong>Reference:</strong> <code>{displayOrderId}</code>
                 </div>
               </div>
-
-              <div className="p-3 bg-white rounded border border-stone-200 flex justify-between items-center">
-                <div>
-                  <span className="text-stone-400 block text-[10px] uppercase">Account Number</span>
-                  <span className="font-mono font-medium text-[#2D2A26]">6289-4019-2041</span>
-                </div>
-                <button
-                  onClick={() => copyToClipboard("6289-4019-2041", "acc")}
-                  className="p-1.5 text-stone-400 hover:text-[#4F2607]"
-                  aria-label="Copy account number"
-                >
-                  {copiedField === "acc" ? <Check className="w-4 h-4 text-emerald-600" /> : <Copy className="w-4 h-4" />}
-                </button>
-              </div>
-
-              <div className="p-3 bg-white rounded border border-stone-200 flex justify-between items-center">
-                <div>
-                  <span className="text-stone-400 block text-[10px] uppercase">SWIFT / BIC Code</span>
-                  <span className="font-mono font-medium text-[#2D2A26]">FIRNZMLX</span>
-                </div>
-                <button
-                  onClick={() => copyToClipboard("FIRNZMLX", "swift")}
-                  className="p-1.5 text-stone-400 hover:text-[#4F2607]"
-                  aria-label="Copy SWIFT code"
-                >
-                  {copiedField === "swift" ? <Check className="w-4 h-4 text-emerald-600" /> : <Copy className="w-4 h-4" />}
-                </button>
-              </div>
-            </div>
-
-            <div className="p-3 bg-amber-50 rounded border border-amber-200 text-xs text-amber-900">
-              <strong>Mandatory Reference:</strong> <code>{displayOrderId}</code>
-            </div>
+            )}
           </div>
 
           {order && (
@@ -149,6 +127,10 @@ export const OrderConfirmationPage: React.FC<OrderConfirmationPageProps> = ({
               <div className="flex justify-between">
                 <span>Destination:</span>
                 <span>{order.shippingAddress.city}, {order.shippingAddress.country}</span>
+              </div>
+              <div className="flex justify-between">
+                <span>Payment Method:</span>
+                <span className="uppercase">{order.payment.method.replace("_", " ")}</span>
               </div>
               <div className="flex justify-between">
                 <span>Total Amount:</span>
@@ -164,7 +146,7 @@ export const OrderConfirmationPage: React.FC<OrderConfirmationPageProps> = ({
               onClick={() => window.print()}
               leftIcon={<Printer className="w-4 h-4" />}
             >
-              Print Pro-Forma Invoice
+              Print Confirmation Record
             </Button>
             <Button
               variant="primary"
