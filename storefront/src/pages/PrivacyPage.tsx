@@ -36,7 +36,7 @@ export const PrivacyPage: React.FC = () => {
 
             <h3 className="font-serif text-lg text-[#4F2607]">4. Contact & Inquiries</h3>
             <p>
-              If you have any questions regarding your data, please contact our data controller at <code>privacy@mukangowaafrica.com</code>.
+              If you have any questions regarding your data, please contact our data controller at <code>privacy@mukangoafrica.co.za</code>.
             </p>
           </div>
         </div>

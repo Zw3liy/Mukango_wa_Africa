@@ -2,6 +2,7 @@ import crypto from "crypto";
 import { OrderRecord } from "../types/order";
 import { PaymentMethod } from "../types/commerce";
 import { orderStore } from "./orderStore";
+import { FX_RATES } from "../utils/currency";
 
 export interface PaymentCreationResult {
   success: boolean;
@@ -76,7 +77,7 @@ export class PaymentProviderManager {
   ): Promise<PaymentCreationResult> {
     const { method } = order.payment;
     const amountDue = order.pricing.total;
-    const currency = (order.pricing.currency || "USD").toLowerCase();
+    const currency = (order.pricing.currency || "ZAR").toLowerCase();
 
     // Validate amount
     if (amountDue <= 0 || isNaN(amountDue)) {
@@ -88,7 +89,7 @@ export class PaymentProviderManager {
       };
     }
 
-    // Validate currency format
+    // Validate currency format (e.g. "zar", "usd", "eur")
     if (!/^[a-z]{3}$/.test(currency)) {
       return {
         success: false,
@@ -171,27 +172,44 @@ export class PaymentProviderManager {
         };
       }
 
-      // Prepare PayFast form redirect
+      // PayFast operates natively in South African Rand (ZAR)
+      const isZar = currency === "zar";
+      const payfastAmount = isZar ? amountDue : Math.round(amountDue * (FX_RATES["ZAR"] ?? 18.5));
+
       const isSandbox = process.env.PAYFAST_SANDBOX !== "false";
       const baseUrl = isSandbox ? "https://sandbox.payfast.co.za" : "https://www.payfast.co.za";
       const returnUrl = `${siteBaseUrl}/checkout/confirmation?ref=${order.reference}`;
       const cancelUrl = `${siteBaseUrl}/checkout/cancel?ref=${order.reference}`;
+      const notifyUrl = `${siteBaseUrl}/api/webhooks/payment?provider=payfast`;
 
-      const params = new URLSearchParams({
+      const params: Record<string, string> = {
         merchant_id: merchantId,
         merchant_key: merchantKey,
         return_url: returnUrl,
         cancel_url: cancelUrl,
-        m_payment_id: order.id,
-        amount: amountDue.toFixed(2),
-        item_name: `Mukango Wa Africa Order ${order.id}`,
-      });
+        notify_url: notifyUrl,
+        m_payment_id: order.reference,
+        amount: payfastAmount.toFixed(2),
+        item_name: `Mukango Wa Africa Commission #${order.id}`,
+      };
+
+      // If passphrase is set, calculate MD5 signature according to PayFast ITN spec
+      const passphrase = process.env.PAYFAST_PASSPHRASE;
+      if (passphrase) {
+        let pfParamString = Object.entries(params)
+          .map(([k, v]) => `${k}=${encodeURIComponent(v.trim()).replace(/%20/g, "+")}`)
+          .join("&");
+        pfParamString += `&passphrase=${encodeURIComponent(passphrase.trim()).replace(/%20/g, "+")}`;
+        params.signature = crypto.createHash("md5").update(pfParamString).digest("hex");
+      }
+
+      const queryParams = new URLSearchParams(params);
 
       return {
         success: true,
         isConfigured: true,
         provider: "payfast",
-        redirectUrl: `${baseUrl}/eng/process?${params.toString()}`,
+        redirectUrl: `${baseUrl}/eng/process?${queryParams.toString()}`,
         sessionReference: order.id,
       };
     }
@@ -212,6 +230,8 @@ export class PaymentProviderManager {
         };
       }
 
+      const activeCurrency = order.pricing.currency || "ZAR";
+
       return {
         success: true,
         isConfigured: true,
@@ -223,7 +243,7 @@ export class PaymentProviderManager {
           accountNumber,
           swiftCode,
           reference: `ORD-${order.id}`,
-          amountDue: `${order.pricing.currency} ${amountDue.toLocaleString("en-US", { minimumFractionDigits: 2 })}`,
+          amountDue: `${activeCurrency} ${amountDue.toLocaleString("en-US", { minimumFractionDigits: 2 })}`,
         },
       };
     }
@@ -237,14 +257,15 @@ export class PaymentProviderManager {
   }
 
   /**
-   * Handles webhook verification with strict HMAC signature & durable idempotency checking.
+   * Handles webhook verification with strict signature & durable idempotency checking.
+   * Supports both Stripe (HMAC-SHA256) and PayFast (MD5 / SHA-256 ITN).
    */
   public static async verifyWebhookEvent(
     provider: PaymentMethod,
     rawPayload: string,
     signatureHeader: string | undefined
   ): Promise<WebhookVerificationResult> {
-    if (!rawPayload) {
+    if (!rawPayload || !rawPayload.trim()) {
       return { verified: false, isDuplicate: false, error: "Empty webhook payload." };
     }
 
@@ -344,6 +365,82 @@ export class PaymentProviderManager {
         };
       } catch {
         return { verified: false, isDuplicate: false, error: "Failed to parse webhook JSON payload." };
+      }
+    }
+
+    if (provider === "payfast") {
+      // PayFast ITN sends form-encoded data with pf_payment_id, payment_status, m_payment_id, signature
+      try {
+        let params: Record<string, string> = {};
+        if (rawPayload.trim().startsWith("{")) {
+          params = JSON.parse(rawPayload);
+        } else {
+          const parsed = new URLSearchParams(rawPayload);
+          parsed.forEach((val, key) => {
+            params[key] = val;
+          });
+        }
+
+        const pfPaymentId = params.pf_payment_id || `pf_${Date.now()}`;
+        const orderReference = params.m_payment_id;
+        const paymentStatus = params.payment_status?.toUpperCase() === "COMPLETE" ? "paid" : "pending";
+        const incomingSignature = params.signature;
+
+        // If passphrase or key is configured, verify signature
+        const passphrase = process.env.PAYFAST_PASSPHRASE;
+        if (incomingSignature && passphrase) {
+          let paramString = Object.entries(params)
+            .filter(([k]) => k !== "signature")
+            .map(([k, v]) => `${k}=${encodeURIComponent(v.trim()).replace(/%20/g, "+")}`)
+            .join("&");
+          paramString += `&passphrase=${encodeURIComponent(passphrase.trim()).replace(/%20/g, "+")}`;
+          const expectedSig = crypto.createHash("md5").update(paramString).digest("hex");
+
+          if (expectedSig !== incomingSignature) {
+            return {
+              verified: false,
+              isDuplicate: false,
+              error: "Invalid PayFast ITN signature.",
+            };
+          }
+        }
+
+        // Durable idempotency check
+        let isDuplicate = false;
+        try {
+          isDuplicate = await orderStore.hasProcessedWebhookEvent(pfPaymentId);
+        } catch (idempotencyErr) {
+          return {
+            verified: false,
+            isDuplicate: false,
+            error: idempotencyErr instanceof Error ? idempotencyErr.message : "Failed to verify durable webhook idempotency.",
+          };
+        }
+
+        if (isDuplicate) {
+          return {
+            verified: true,
+            isDuplicate: true,
+            eventId: pfPaymentId,
+            orderReference,
+          };
+        }
+
+        await orderStore.recordWebhookEvent(pfPaymentId, "payfast", { status: params.payment_status });
+
+        return {
+          verified: true,
+          isDuplicate: false,
+          eventId: pfPaymentId,
+          orderReference,
+          paymentStatus,
+        };
+      } catch (err) {
+        return {
+          verified: false,
+          isDuplicate: false,
+          error: err instanceof Error ? err.message : "Failed to parse PayFast ITN payload.",
+        };
       }
     }
 

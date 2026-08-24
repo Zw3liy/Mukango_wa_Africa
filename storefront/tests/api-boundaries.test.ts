@@ -5,7 +5,7 @@ import { orderStore } from "../src/server/orderStore";
 import { handler as netlifyHandler } from "../netlify/functions/api";
 
 describe("Server API Boundaries & Routing", () => {
-  it("GET /api/health returns 200 with service info", async () => {
+  it("GET /api/health returns 200 with service info and authoritative currency", async () => {
     const res = await handleApiRequest({
       method: "GET",
       pathname: "/api/health",
@@ -17,9 +17,10 @@ describe("Server API Boundaries & Routing", () => {
     const body = JSON.parse(res.body);
     expect(body.status).toBe("healthy");
     expect(body.service).toContain("Mukango");
+    expect(body.authoritativeCurrency).toBe("ZAR");
   });
 
-  it("POST /api/cart/validate returns authoritative pricing", async () => {
+  it("POST /api/cart/validate returns authoritative ZAR pricing by default", async () => {
     const res = await handleApiRequest({
       method: "POST",
       pathname: "/api/cart/validate",
@@ -33,7 +34,9 @@ describe("Server API Boundaries & Routing", () => {
     expect(res.status).toBe(200);
     const body = JSON.parse(res.body);
     expect(body.success).toBe(true);
-    expect(body.result.pricing.subtotal).toBe(1850);
+    expect(body.result.pricing.currency).toBe("ZAR");
+    // 1850 * 18.5 = 34,225 ZAR
+    expect(body.result.pricing.subtotal).toBe(34225);
   });
 
   it("GET /api/checkout/order-status returns 404 for unknown reference and 200 for stored order", async () => {
@@ -55,7 +58,7 @@ describe("Server API Boundaries & Routing", () => {
       customer: { firstName: "Chloe", lastName: "Anderson", email: "chloe@example.com", phone: "+44 7123" },
       shippingAddress: { streetLine1: "1 High St", city: "London", stateProvince: "Greater London", postalCode: "SW1", country: "UK" },
       items: [],
-      pricing: { currency: "USD", subtotal: 100, shippingEstimate: 0, insuranceAndHandling: 0, taxEstimate: 0, total: 100, isServerAuthoritative: true, validatedAt: "" },
+      pricing: { currency: "ZAR", subtotal: 34225, shippingEstimate: 3330, insuranceAndHandling: 513, taxEstimate: 0, total: 38068, isServerAuthoritative: true, validatedAt: "" },
       payment: { method: "stripe" },
       timeline: [],
     });
@@ -69,6 +72,7 @@ describe("Server API Boundaries & Routing", () => {
     expect(foundRes.status).toBe(200);
     const foundBody = JSON.parse(foundRes.body);
     expect(foundBody.order.id).toBe("MWA-2026-9999");
+    expect(foundBody.order.pricing.currency).toBe("ZAR");
   });
 
   it("handles CORS preflight OPTIONS requests securely for permitted origin", async () => {
@@ -76,11 +80,11 @@ describe("Server API Boundaries & Routing", () => {
       method: "OPTIONS",
       pathname: "/api/cart/validate",
       searchParams: new URLSearchParams(),
-      headers: { origin: "https://mukangowaafrica.com" },
+      headers: { origin: "https://mukangoafrica.co.za" },
     });
 
     expect(res.status).toBe(204);
-    expect(res.headers["Access-Control-Allow-Origin"]).toBe("https://mukangowaafrica.com");
+    expect(res.headers["Access-Control-Allow-Origin"]).toBe("https://mukangoafrica.co.za");
   });
 
   it("rejects CORS preflight OPTIONS requests from forbidden origins (403 Forbidden)", async () => {
@@ -96,11 +100,11 @@ describe("Server API Boundaries & Routing", () => {
 
   it("executes Netlify serverless function entrypoint successfully", async () => {
     const netlifyEvent: HandlerEvent = {
-      rawUrl: "https://mukangowaafrica.com/.netlify/functions/api/health",
+      rawUrl: "https://mukangoafrica.co.za/.netlify/functions/api/health",
       rawQuery: "",
       path: "/.netlify/functions/api/health",
       httpMethod: "GET",
-      headers: { host: "mukangowaafrica.com" },
+      headers: { host: "mukangoafrica.co.za" },
       multiValueHeaders: {},
       queryStringParameters: {},
       multiValueQueryStringParameters: {},

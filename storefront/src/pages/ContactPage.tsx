@@ -120,9 +120,9 @@ export const ContactPage: React.FC = () => {
                   <Mail className="w-5 h-5 text-[#8B6F47] shrink-0 mt-0.5" />
                   <div>
                     <strong className="font-medium text-[#4F2607] block text-sm">Direct Atelier Inquiries</strong>
-                    <span>hello@mukangowaafrica.com</span>
+                    <span>hello@mukangoafrica.co.za</span>
                     <br />
-                    <span>bespoke@mukangowaafrica.com</span>
+                    <span>bespoke@mukangoafrica.co.za</span>
                   </div>
                 </div>
 

@@ -3,7 +3,7 @@ import { SEO } from "../components/common/SEO";
 import { Button } from "../components/common/Button";
 import { OrderRecord } from "../types/order";
 import { CheckCircle2, Building2, Printer, FileText, Mail } from "lucide-react";
-import { formatPrice } from "../utils/currency";
+import { formatCurrency } from "../utils/currency";
 
 interface OrderConfirmationPageProps {
   reference?: string;
@@ -134,7 +134,7 @@ export const OrderConfirmationPage: React.FC<OrderConfirmationPageProps> = ({
               </div>
               <div className="flex justify-between">
                 <span>Total Amount:</span>
-                <span className="font-semibold text-[#4F2607]">{formatPrice(order.pricing.total)}</span>
+                <span className="font-semibold text-[#4F2607]">{formatCurrency(order.pricing.total, order.pricing.currency)}</span>
               </div>
             </div>
           )}

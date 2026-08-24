@@ -53,7 +53,7 @@ describe("Checkout Boundary & Order Persistence", () => {
         },
         paymentMethod: "wire_transfer",
       },
-      "https://mukangowaafrica.com"
+      "https://mukangoafrica.co.za"
     );
 
     expect(res.status).toBe("config_error");
@@ -62,10 +62,10 @@ describe("Checkout Boundary & Order Persistence", () => {
   });
 
   it("creates bank wire pro-forma invoice session when configured with official bank details", async () => {
-    process.env.BANK_NAME = "Stanbic Bank Zambia";
-    process.env.BANK_ACCOUNT_NAME = "Mukango Wa Africa Artisans";
-    process.env.BANK_ACCOUNT_NUMBER = "913000482910";
-    process.env.BANK_SWIFT_CODE = "SBICZMLX";
+    process.env.BANK_NAME = "Standard Chartered Bank Zambia PLC";
+    process.env.BANK_ACCOUNT_NAME = "Mukango Wa Africa Artisans Ltd";
+    process.env.BANK_ACCOUNT_NUMBER = "0100123456700";
+    process.env.BANK_SWIFT_CODE = "SCBLZMLX";
 
     const validRes = await processCheckoutSession(
       {
@@ -85,21 +85,22 @@ describe("Checkout Boundary & Order Persistence", () => {
         },
         paymentMethod: "wire_transfer",
       },
-      "https://mukangowaafrica.com"
+      "https://mukangoafrica.co.za"
     );
 
     expect(validRes.status).toBe("invoice_created");
     expect(validRes.orderId).toMatch(/^MWA-/);
     expect(validRes.reference).toBeDefined();
     expect(validRes.invoiceInstructions).toBeDefined();
-    expect(validRes.invoiceInstructions?.swiftCode).toBe("SBICZMLX");
-    expect(validRes.invoiceInstructions?.amountDue).toContain("USD");
+    expect(validRes.invoiceInstructions?.swiftCode).toBe("SCBLZMLX");
+    expect(validRes.invoiceInstructions?.amountDue).toContain("ZAR");
 
     // Verify order was saved into orderStore
     const retrieved = await orderStore.getOrderByReference(validRes.reference);
     expect(retrieved).not.toBeNull();
     expect(retrieved?.customer.email).toBe("amelia.duarte@example.com");
     expect(retrieved?.status).toBe("pending_payment");
+    expect(retrieved?.pricing.currency).toBe("ZAR");
   });
 
   it("fails explicitly when unconfigured Stripe credentials are used (No fake commerce)", async () => {
@@ -123,7 +124,7 @@ describe("Checkout Boundary & Order Persistence", () => {
         },
         paymentMethod: "stripe",
       },
-      "https://mukangowaafrica.com"
+      "https://mukangoafrica.co.za"
     );
 
     expect(res.status).toBe("config_error");

@@ -58,7 +58,7 @@ export async function handleContactFormSubmission(
   }
 
   const submissionId = `MWA-ENQ-${crypto.randomBytes(4).toString("hex").toUpperCase()}`;
-  const receiverEmail = process.env.CONTACT_RECEIVER_EMAIL || "enquiries@mukangowaafrica.com";
+  const receiverEmail = process.env.CONTACT_RECEIVER_EMAIL || "enquiries@mukangoafrica.co.za";
 
   // 4. Dispatch email to receiver
   const emailHtml = `
@@ -144,7 +144,7 @@ export async function handleBespokeFormSubmission(
   }
 
   const submissionId = `MWA-BESPOKE-${crypto.randomBytes(4).toString("hex").toUpperCase()}`;
-  const receiverEmail = process.env.CONTACT_RECEIVER_EMAIL || "bespoke@mukangowaafrica.com";
+  const receiverEmail = process.env.CONTACT_RECEIVER_EMAIL || "bespoke@mukangoafrica.co.za";
 
   const emailHtml = `
     <h2>New Bespoke Commission Request [${submissionId}]</h2>

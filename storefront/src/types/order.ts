@@ -1,4 +1,4 @@
-import { CartItem, PricingBreakdown, PaymentMethod, OrderStatus } from "./commerce";
+import { CartItem, PricingBreakdown, PaymentMethod, OrderStatus, Currency } from "./commerce";
 
 export interface CustomerDetails {
   firstName: string;
@@ -55,6 +55,8 @@ export interface CreateCheckoutSessionRequest {
   shippingAddress: Address;
   paymentMethod: PaymentMethod;
   shippingRateId?: string;
+  promoCode?: string;
+  currency?: Currency;
   idempotencyKey?: string;
 }
 

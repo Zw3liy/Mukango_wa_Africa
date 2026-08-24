@@ -1,6 +1,7 @@
 import { PRODUCTS } from "../data/products";
 import { WOOD_FINISHES } from "../data/timbers";
 import { CartItem, PricingBreakdown, Currency } from "../types/commerce";
+import { FX_RATES, DEFAULT_CURRENCY } from "../utils/currency";
 
 export interface CartValidationInput {
   items: {
@@ -26,13 +27,15 @@ export function validateCartServerSide(input: CartValidationInput): CartValidati
   const errors: string[] = [];
   const warnings: string[] = [];
   const authoritativeItems: CartItem[] = [];
+  const targetCurrency: Currency = input.currency || DEFAULT_CURRENCY;
+  const rate = FX_RATES[targetCurrency] ?? 1.0;
 
   if (!input.items || !Array.isArray(input.items) || input.items.length === 0) {
     return {
       isValid: false,
       authoritativeItems: [],
       pricing: {
-        currency: input.currency || "USD",
+        currency: targetCurrency,
         subtotal: 0,
         shippingEstimate: 0,
         insuranceAndHandling: 0,
@@ -83,7 +86,7 @@ export function validateCartServerSide(input: CartValidationInput): CartValidati
       isValid: false,
       authoritativeItems: [],
       pricing: {
-        currency: input.currency || "USD",
+        currency: targetCurrency,
         subtotal: 0,
         shippingEstimate: 0,
         insuranceAndHandling: 0,
@@ -98,14 +101,16 @@ export function validateCartServerSide(input: CartValidationInput): CartValidati
   }
 
   // Authoritative shipping & crating calculation
-  // For luxury handcrafted furniture, crating and insured freight scale with item weight/dimensions
+  // Base shipping in USD: $180 baseline insured crate shipment, $80 per additional item
   const totalItemsCount = authoritativeItems.reduce((acc, i) => acc + i.quantity, 0);
-  const baseShippingRate = 180; // Insured baseline crate shipment
-  const perAdditionalItemShipping = 80;
-  const shippingEstimate = baseShippingRate + (totalItemsCount - 1) * perAdditionalItemShipping;
+  const shippingEstimateUsd = 180 + (totalItemsCount - 1) * 80;
 
-  // Insurance & white glove handling (1.5% of value)
-  const insuranceAndHandling = Math.round(subtotalUsd * 0.015);
+  // Convert to target currency (authoritative ZAR default)
+  const subtotal = Math.round(subtotalUsd * rate);
+  const shippingEstimate = Math.round(shippingEstimateUsd * rate);
+
+  // Insurance & white glove handling (1.5% of cargo value)
+  const insuranceAndHandling = Math.round(subtotal * 0.015);
 
   // International export tax estimate (0% export duty from Zambia with SADC/AGOA duty exemptions)
   const taxEstimate = 0;
@@ -115,7 +120,7 @@ export function validateCartServerSide(input: CartValidationInput): CartValidati
   if (input.promoCode) {
     const code = input.promoCode.trim().toUpperCase();
     if (code === "HEIRLOOM10") {
-      const discountAmount = Math.round(subtotalUsd * 0.1);
+      const discountAmount = Math.round(subtotal * 0.1);
       appliedDiscount = {
         code: "HEIRLOOM10",
         amount: discountAmount,
@@ -127,11 +132,11 @@ export function validateCartServerSide(input: CartValidationInput): CartValidati
   }
 
   const discountAmount = appliedDiscount ? appliedDiscount.amount : 0;
-  const total = Math.max(0, subtotalUsd + shippingEstimate + insuranceAndHandling + taxEstimate - discountAmount);
+  const total = Math.max(0, subtotal + shippingEstimate + insuranceAndHandling + taxEstimate - discountAmount);
 
   const pricing: PricingBreakdown = {
-    currency: "USD",
-    subtotal: subtotalUsd,
+    currency: targetCurrency,
+    subtotal,
     shippingEstimate,
     insuranceAndHandling,
     taxEstimate,

@@ -3,7 +3,7 @@ import { useCart } from "../context/CartContext";
 import { SEO } from "../components/common/SEO";
 import { Breadcrumbs } from "../components/common/Breadcrumbs";
 import { Button } from "../components/common/Button";
-import { formatPrice } from "../utils/currency";
+import { formatPrice, formatCurrency } from "../utils/currency";
 import { PaymentMethod } from "../types/commerce";
 import { useToast } from "../context/ToastContext";
 import { ShieldCheck, CreditCard, Building2, Lock, AlertCircle, ArrowRight } from "lucide-react";
@@ -253,11 +253,10 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ onNavigate }) => {
 
                 <div>
                   <label className="block text-[11px] uppercase tracking-wider text-stone-600 mb-1">
-                    Province / State *
+                    State / Province / Region
                   </label>
                   <input
                     type="text"
-                    required
                     value={shippingAddress.stateProvince}
                     onChange={(e) => setShippingAddress({ ...shippingAddress, stateProvince: e.target.value })}
                     className="w-full text-xs p-3 bg-[#FAF9F6] border border-[#D4B896] rounded text-[#2D2A26] focus:outline-hidden focus:border-[#4F2607]"
@@ -268,7 +267,7 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ onNavigate }) => {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-[11px] uppercase tracking-wider text-stone-600 mb-1">
-                    Postal / Zip Code *
+                    Postal / ZIP Code *
                   </label>
                   <input
                     type="text"
@@ -433,25 +432,25 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ onNavigate }) => {
               <div className="space-y-2.5 text-xs text-stone-700 font-light pt-4 border-t border-[#D4B896]/30">
                 <div className="flex justify-between">
                   <span>Subtotal:</span>
-                  <span className="font-medium text-[#2D2A26]">{formatPrice(pricing.subtotal)}</span>
+                  <span className="font-medium text-[#2D2A26]">{formatCurrency(pricing.subtotal, pricing.currency)}</span>
                 </div>
                 <div className="flex justify-between">
                   <span>Phytosanitary Crated Freight:</span>
-                  <span className="font-medium text-[#2D2A26]">{formatPrice(pricing.shippingEstimate)}</span>
+                  <span className="font-medium text-[#2D2A26]">{formatCurrency(pricing.shippingEstimate, pricing.currency)}</span>
                 </div>
                 <div className="flex justify-between">
                   <span>Transit Insurance:</span>
-                  <span className="font-medium text-[#2D2A26]">{formatPrice(pricing.insuranceAndHandling)}</span>
+                  <span className="font-medium text-[#2D2A26]">{formatCurrency(pricing.insuranceAndHandling, pricing.currency)}</span>
                 </div>
                 {pricing.appliedDiscount && (
                   <div className="flex justify-between text-emerald-700 font-medium">
                     <span>Discount ({pricing.appliedDiscount.code}):</span>
-                    <span>-{formatPrice(pricing.appliedDiscount.amount)}</span>
+                    <span>-{formatCurrency(pricing.appliedDiscount.amount, pricing.currency)}</span>
                   </div>
                 )}
                 <div className="pt-3 border-t border-[#D4B896]/30 flex justify-between text-lg font-serif text-[#4F2607] font-semibold">
                   <span>Authoritative Total:</span>
-                  <span>{formatPrice(pricing.total)}</span>
+                  <span>{formatCurrency(pricing.total, pricing.currency)}</span>
                 </div>
               </div>
 
