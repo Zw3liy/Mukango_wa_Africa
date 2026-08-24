@@ -4,4 +4,4 @@ Disallow: /cart
 Disallow: /checkout
 Disallow: /api/
 
-Sitemap: https://mukangowaafrica.com/sitemap.xml
+Sitemap: https://mukangoafrica.co.za/sitemap.xml

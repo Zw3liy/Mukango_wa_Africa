@@ -11,7 +11,7 @@ import { PaymentMethod } from "../types/commerce";
 
 function jsonResponse(status: number, data: unknown, originHeader?: string): ApiServerResponse {
   const isAllowed = validateOrigin(originHeader);
-  const allowedOrigin = isAllowed && originHeader ? originHeader : "https://mukangowaafrica.com";
+  const allowedOrigin = isAllowed && originHeader ? originHeader : "https://mukangoafrica.co.za";
 
   return {
     status,
@@ -51,7 +51,7 @@ export async function handleApiRequest(req: ApiServerRequest): Promise<ApiServer
     return {
       status: 204,
       headers: {
-        "Access-Control-Allow-Origin": originHeader || "https://mukangowaafrica.com",
+        "Access-Control-Allow-Origin": originHeader || "https://mukangoafrica.co.za",
         "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
         "Access-Control-Allow-Headers": "Content-Type, Authorization, Stripe-Signature, X-PayFast-Signature",
         "Access-Control-Max-Age": "86400",

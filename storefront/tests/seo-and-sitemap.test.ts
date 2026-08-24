@@ -5,18 +5,18 @@ import { PRODUCTS } from "../src/data/products";
 
 describe("SEO & Sitemap Validation", () => {
   it("generates valid sitemap XML including all public pages, products, collections, journal entries", () => {
-    const siteUrl = "https://mukangowaafrica.com";
+    const siteUrl = "https://mukangoafrica.co.za";
     const xml = generateSitemapXml(siteUrl);
 
     expect(xml).toContain("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
     expect(xml).toContain("<urlset xmlns=\"http://www.sitemaps.org/schemas/sitemap/0.9\">");
-    expect(xml).toContain("<loc>https://mukangowaafrica.com/</loc>");
-    expect(xml).toContain("<loc>https://mukangowaafrica.com/shop</loc>");
-    expect(xml).toContain("<loc>https://mukangowaafrica.com/collections</loc>");
-    expect(xml).toContain("<loc>https://mukangowaafrica.com/bespoke</loc>");
-    expect(xml).toContain("<loc>https://mukangowaafrica.com/about</loc>");
-    expect(xml).toContain("<loc>https://mukangowaafrica.com/craftsmanship</loc>");
-    expect(xml).toContain("<loc>https://mukangowaafrica.com/journal</loc>");
+    expect(xml).toContain("<loc>https://mukangoafrica.co.za/</loc>");
+    expect(xml).toContain("<loc>https://mukangoafrica.co.za/shop</loc>");
+    expect(xml).toContain("<loc>https://mukangoafrica.co.za/collections</loc>");
+    expect(xml).toContain("<loc>https://mukangoafrica.co.za/bespoke</loc>");
+    expect(xml).toContain("<loc>https://mukangoafrica.co.za/about</loc>");
+    expect(xml).toContain("<loc>https://mukangoafrica.co.za/craftsmanship</loc>");
+    expect(xml).toContain("<loc>https://mukangoafrica.co.za/journal</loc>");
   });
 
   it("STRICTLY EXCLUDES private routes (/cart, /checkout) from sitemap", () => {
@@ -36,7 +36,7 @@ describe("SEO & Sitemap Validation", () => {
 
   it("generates valid Product JSON-LD with schema.org specifications and authoritative ZAR pricing", () => {
     const product = PRODUCTS[0];
-    const jsonLdStr = generateProductJsonLd(product, "https://mukangowaafrica.com");
+    const jsonLdStr = generateProductJsonLd(product, "https://mukangoafrica.co.za");
     const parsed = JSON.parse(jsonLdStr);
 
     expect(parsed["@type"]).toBe("Product");
@@ -47,7 +47,7 @@ describe("SEO & Sitemap Validation", () => {
     expect(parsed.countryOfOrigin.name).toBe("Zambia");
 
     // Also supports explicit USD
-    const usdJsonLd = generateProductJsonLd(product, "https://mukangowaafrica.com", "USD");
+    const usdJsonLd = generateProductJsonLd(product, "https://mukangoafrica.co.za", "USD");
     const parsedUsd = JSON.parse(usdJsonLd);
     expect(parsedUsd.offers.priceCurrency).toBe("USD");
     expect(parsedUsd.offers.price).toBe(product.basePriceUsd.toFixed(2));

@@ -58,7 +58,7 @@ export const ShowroomSection: React.FC<ShowroomSectionProps> = ({ onNavigate }) 
 
               <div className="flex items-center gap-3">
                 <Mail className="w-5 h-5 text-[#8B6F47] shrink-0" />
-                <span>hello@mukangowaafrica.com</span>
+                <span>hello@mukangoafrica.co.za</span>
               </div>
             </div>
 

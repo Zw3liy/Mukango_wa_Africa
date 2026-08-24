@@ -80,11 +80,11 @@ describe("Server API Boundaries & Routing", () => {
       method: "OPTIONS",
       pathname: "/api/cart/validate",
       searchParams: new URLSearchParams(),
-      headers: { origin: "https://mukangowaafrica.com" },
+      headers: { origin: "https://mukangoafrica.co.za" },
     });
 
     expect(res.status).toBe(204);
-    expect(res.headers["Access-Control-Allow-Origin"]).toBe("https://mukangowaafrica.com");
+    expect(res.headers["Access-Control-Allow-Origin"]).toBe("https://mukangoafrica.co.za");
   });
 
   it("rejects CORS preflight OPTIONS requests from forbidden origins (403 Forbidden)", async () => {
@@ -100,11 +100,11 @@ describe("Server API Boundaries & Routing", () => {
 
   it("executes Netlify serverless function entrypoint successfully", async () => {
     const netlifyEvent: HandlerEvent = {
-      rawUrl: "https://mukangowaafrica.com/.netlify/functions/api/health",
+      rawUrl: "https://mukangoafrica.co.za/.netlify/functions/api/health",
       rawQuery: "",
       path: "/.netlify/functions/api/health",
       httpMethod: "GET",
-      headers: { host: "mukangowaafrica.com" },
+      headers: { host: "mukangoafrica.co.za" },
       multiValueHeaders: {},
       queryStringParameters: {},
       multiValueQueryStringParameters: {},

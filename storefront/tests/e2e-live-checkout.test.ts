@@ -88,7 +88,7 @@ describe("End-to-End Live Checkout & Webhook Integration Suite", () => {
         },
         paymentMethod: "wire_transfer",
       },
-      "https://mukangowaafrica.com"
+      "https://mukangoafrica.co.za"
     );
 
     expect(checkoutResult.status).toBe("invoice_created");
@@ -113,7 +113,7 @@ describe("End-to-End Live Checkout & Webhook Integration Suite", () => {
       method: "GET",
       pathname: "/api/checkout/order-status",
       searchParams: new URLSearchParams(`ref=${checkoutResult.reference}`),
-      headers: { origin: "https://mukangowaafrica.com" },
+      headers: { origin: "https://mukangoafrica.co.za" },
     });
 
     expect(apiRes.status).toBe(200);
@@ -142,7 +142,7 @@ describe("End-to-End Live Checkout & Webhook Integration Suite", () => {
         },
         paymentMethod: "payfast",
       },
-      "https://mukangowaafrica.com"
+      "https://mukangoafrica.co.za"
     );
 
     expect(checkoutRes.status).toBe("redirect_required");
@@ -184,7 +184,7 @@ describe("End-to-End Live Checkout & Webhook Integration Suite", () => {
       searchParams: new URLSearchParams("provider=payfast"),
       headers: {
         "content-type": "application/x-www-form-urlencoded",
-        origin: "https://mukangowaafrica.com",
+        origin: "https://mukangoafrica.co.za",
       },
       rawBody: rawPayload,
     });
@@ -208,7 +208,7 @@ describe("End-to-End Live Checkout & Webhook Integration Suite", () => {
       searchParams: new URLSearchParams("provider=payfast"),
       headers: {
         "content-type": "application/x-www-form-urlencoded",
-        origin: "https://mukangowaafrica.com",
+        origin: "https://mukangoafrica.co.za",
       },
       rawBody: rawPayload,
     });
@@ -239,7 +239,7 @@ describe("End-to-End Live Checkout & Webhook Integration Suite", () => {
         },
         paymentMethod: "wire_transfer",
       },
-      "https://mukangowaafrica.com"
+      "https://mukangoafrica.co.za"
     );
 
     expect(draftRes.orderId).toBeDefined();
@@ -272,7 +272,7 @@ describe("End-to-End Live Checkout & Webhook Integration Suite", () => {
       headers: {
         "stripe-signature": `t=${timestamp},v1=${signature}`,
         "content-type": "application/json",
-        origin: "https://mukangowaafrica.com",
+        origin: "https://mukangoafrica.co.za",
       },
       rawBody: payload,
     });

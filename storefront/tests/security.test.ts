@@ -31,7 +31,7 @@ describe("Security, Sanitization & Webhook Integrity", () => {
 
   it("validates emails according to RFC specifications", () => {
     expect(isValidEmail("client@domain.com")).toBe(true);
-    expect(isValidEmail("patron.test+safari@mukangowaafrica.com")).toBe(true);
+    expect(isValidEmail("patron.test+safari@mukangoafrica.co.za")).toBe(true);
     expect(isValidEmail("plainaddress")).toBe(false);
     expect(isValidEmail("@missingusername.com")).toBe(false);
   });
@@ -44,6 +44,8 @@ describe("Security, Sanitization & Webhook Integrity", () => {
   });
 
   it("validates CORS origins securely", () => {
+    expect(validateOrigin("https://mukangoafrica.co.za")).toBe(true);
+    expect(validateOrigin("https://www.mukangoafrica.co.za")).toBe(true);
     expect(validateOrigin("https://mukangowaafrica.com")).toBe(true);
     expect(validateOrigin("http://localhost:5173")).toBe(true);
     expect(validateOrigin("https://3000-sandbox-id.e2b.app")).toBe(true);

@@ -10,7 +10,7 @@ export function getBaseSiteUrl(): string {
   if (typeof process !== "undefined" && process.env?.SITE_URL) {
     return process.env.SITE_URL.replace(/\/+$/, "");
   }
-  return "https://mukangowaafrica.com";
+  return "https://mukangoafrica.co.za";
 }
 
 export function generateProductJsonLd(
@@ -88,7 +88,7 @@ export function generateOrganizationJsonLd(siteUrl?: string): string {
     "@context": "https://schema.org",
     "@type": "FurnitureStore",
     name: "Mukango Wa Africa",
-    description: "Heirloom handcrafted furniture bridging Zambian artisanal mastery with contemporary design.",
+    description: "Heirloom handcrafted furniture bridging Zambian artisanal mastery with contemporary architecture.",
     url: base,
     logo: `${base}/favicon.svg`,
     address: {
@@ -101,7 +101,7 @@ export function generateOrganizationJsonLd(siteUrl?: string): string {
       "@type": "ContactPoint",
       telephone: "+260-97-123-4567",
       contactType: "customer service",
-      email: "hello@mukangowaafrica.com",
+      email: "hello@mukangoafrica.co.za",
     },
   };
 

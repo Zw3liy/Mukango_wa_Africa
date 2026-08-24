@@ -6,7 +6,7 @@ import { generateSitemapXml } from "../src/utils/sitemap";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const siteUrl = process.env.SITE_URL || "https://mukangowaafrica.com";
+const siteUrl = process.env.SITE_URL || "https://mukangoafrica.co.za";
 
 try {
   const xml = generateSitemapXml(siteUrl);

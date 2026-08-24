@@ -53,7 +53,7 @@ describe("Checkout Boundary & Order Persistence", () => {
         },
         paymentMethod: "wire_transfer",
       },
-      "https://mukangowaafrica.com"
+      "https://mukangoafrica.co.za"
     );
 
     expect(res.status).toBe("config_error");
@@ -85,7 +85,7 @@ describe("Checkout Boundary & Order Persistence", () => {
         },
         paymentMethod: "wire_transfer",
       },
-      "https://mukangowaafrica.com"
+      "https://mukangoafrica.co.za"
     );
 
     expect(validRes.status).toBe("invoice_created");
@@ -124,7 +124,7 @@ describe("Checkout Boundary & Order Persistence", () => {
         },
         paymentMethod: "stripe",
       },
-      "https://mukangowaafrica.com"
+      "https://mukangoafrica.co.za"
     );
 
     expect(res.status).toBe("config_error");

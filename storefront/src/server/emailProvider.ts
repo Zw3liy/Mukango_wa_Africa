@@ -57,7 +57,7 @@ export class EmailDeliveryProvider {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            from: process.env.EMAIL_FROM || "Mukango Wa Africa <orders@mukangowaafrica.com>",
+            from: process.env.EMAIL_FROM || "Mukango Wa Africa <orders@mukangoafrica.co.za>",
             to: payload.to,
             subject: payload.subject,
             html: payload.htmlContent,
@@ -127,10 +127,10 @@ export class EmailDeliveryProvider {
           <h3 style="margin-top: 0; color: #4F2607; font-family: Georgia, serif; font-size: 16px;">Bank Wire / Pro-Forma Instructions</h3>
           <p style="font-size: 13px; color: #57534e; margin-bottom: 8px;">Please arrange swift transfer with the following details:</p>
           <table style="width: 100%; font-size: 13px; color: #292524;">
-            <tr><td><strong>Bank:</strong></td><td>${process.env.BANK_NAME || "Stanbic Bank Zambia"}</td></tr>
-            <tr><td><strong>Account Name:</strong></td><td>${process.env.BANK_ACCOUNT_NAME || "Mukango Wa Africa Artisans"}</td></tr>
-            <tr><td><strong>Account Number:</strong></td><td>${process.env.BANK_ACCOUNT_NUMBER || "913000482910"}</td></tr>
-            <tr><td><strong>SWIFT Code:</strong></td><td>${process.env.BANK_SWIFT_CODE || "SBICZMLX"}</td></tr>
+            <tr><td><strong>Bank:</strong></td><td>${process.env.BANK_NAME || "Standard Chartered Bank Zambia PLC"}</td></tr>
+            <tr><td><strong>Account Name:</strong></td><td>${process.env.BANK_ACCOUNT_NAME || "Mukango Wa Africa Artisans Ltd"}</td></tr>
+            <tr><td><strong>Account Number:</strong></td><td>${process.env.BANK_ACCOUNT_NUMBER || "0100123456700"}</td></tr>
+            <tr><td><strong>SWIFT Code:</strong></td><td>${process.env.BANK_SWIFT_CODE || "SCBLZMLX"}</td></tr>
             <tr><td><strong>Payment Reference:</strong></td><td>ORD-${order.id}</td></tr>
             <tr><td><strong>Amount Due:</strong></td><td><strong>${formatCurrency(order.pricing.total, currency)}</strong></td></tr>
           </table>
@@ -184,7 +184,7 @@ export class EmailDeliveryProvider {
             <div style="border-top: 1px solid #e7e5e4; padding-top: 16px; margin-top: 24px; font-size: 12px; color: #78716c; line-height: 1.5;">
               <p><strong>Delivery Destination:</strong> ${order.shippingAddress.streetLine1}, ${order.shippingAddress.city}, ${order.shippingAddress.country}</p>
               <p><strong>Heirloom Guarantee:</strong> All timber pieces are certified for 25 years against structural joinery failure.</p>
-              <p>Questions? Contact our master craftsman atelier directly at <a href="mailto:enquiries@mukangowaafrica.com" style="color: #8B6F47;">enquiries@mukangowaafrica.com</a>.</p>
+              <p>Questions? Contact our master craftsman atelier directly at <a href="mailto:enquiries@mukangoafrica.co.za" style="color: #8B6F47;">enquiries@mukangoafrica.co.za</a>.</p>
             </div>
           </div>
         </div>

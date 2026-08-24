@@ -108,7 +108,7 @@ export const MobileNav: React.FC<MobileNavProps> = ({
           </div>
           <div className="flex items-center gap-2">
             <Mail className="w-4 h-4 text-[#8B6F47] shrink-0" />
-            <span>hello@mukangowaafrica.com</span>
+            <span>hello@mukangoafrica.co.za</span>
           </div>
         </div>
       </div>
