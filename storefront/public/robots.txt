@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+Disallow: /cart
+Disallow: /checkout
+Disallow: /api/
+
+Sitemap: https://mukangoafrica.co.za/sitemap.xml
