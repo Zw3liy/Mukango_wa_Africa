@@ -253,7 +253,7 @@ export const BespokeForm: React.FC = () => {
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
         <div>
           <label className="block text-xs uppercase tracking-wider text-stone-700 font-medium mb-2">
-            7. Target Investment Range (USD)
+            7. Target Investment Range (ZAR / USD)
           </label>
           <select
             value={formData.budgetRangeUsd}
@@ -265,10 +265,10 @@ export const BespokeForm: React.FC = () => {
             }
             className="w-full text-xs p-3 bg-white border border-[#D4B896] rounded text-[#2D2A26] focus:outline-hidden focus:border-[#4F2607]"
           >
-            <option value="under_3000">Under $3,000</option>
-            <option value="3000_7500">$3,000 – $7,500</option>
-            <option value="7500_15000">$7,500 – $15,000</option>
-            <option value="15000_plus">$15,000+ (Full Residence / Lodge Suite)</option>
+            <option value="under_3000">Under R 50,000 (~$3,000 USD)</option>
+            <option value="3000_7500">R 50,000 – R 135,000 ($3,000 – $7,500 USD)</option>
+            <option value="7500_15000">R 135,000 – R 275,000 ($7,500 – $15,000 USD)</option>
+            <option value="15000_plus">R 275,000+ ($15,000+ USD) — Full Residence / Lodge Suite</option>
           </select>
         </div>
 

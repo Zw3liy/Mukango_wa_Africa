@@ -1,4 +1,6 @@
 import { Product } from "../types/product";
+import { Currency } from "../types/commerce";
+import { FX_RATES, DEFAULT_CURRENCY } from "./currency";
 
 export function getBaseSiteUrl(): string {
   // In browser, window.location.origin can be used; on server / build time, check process.env.SITE_URL
@@ -11,12 +13,19 @@ export function getBaseSiteUrl(): string {
   return "https://mukangowaafrica.com";
 }
 
-export function generateProductJsonLd(product: Product, siteUrl?: string): string {
+export function generateProductJsonLd(
+  product: Product,
+  siteUrl?: string,
+  currency: Currency = DEFAULT_CURRENCY
+): string {
   const base = siteUrl || getBaseSiteUrl();
   const productUrl = `${base}/products/${product.slug}`;
   const imageUrl = product.images.hero.startsWith("http")
     ? product.images.hero
     : `${base}${product.images.hero}`;
+
+  const rate = FX_RATES[currency] ?? 1.0;
+  const price = (product.basePriceUsd * rate).toFixed(2);
 
   const schema = {
     "@context": "https://schema.org/",
@@ -33,8 +42,8 @@ export function generateProductJsonLd(product: Product, siteUrl?: string): strin
     offers: {
       "@type": "Offer",
       url: productUrl,
-      priceCurrency: "USD",
-      price: product.basePriceUsd.toFixed(2),
+      priceCurrency: currency,
+      price: price,
       availability: product.inStockCount > 0
         ? "https://schema.org/InStock"
         : "https://schema.org/PreOrder",

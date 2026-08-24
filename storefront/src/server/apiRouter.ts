@@ -3,9 +3,11 @@ import { validateCartServerSide } from "./cartValidator";
 import { processCheckoutSession } from "./checkoutService";
 import { orderStore, ProductionOrderStore } from "./orderStore";
 import { PaymentProviderManager } from "./paymentProvider";
+import { EmailDeliveryProvider } from "./emailProvider";
 import { handleContactFormSubmission, handleBespokeFormSubmission, handleNewsletterSubmission } from "./formHandler";
 import { validateOrigin, enforcePayloadSizeLimit } from "./security";
 import { globalRateLimiter } from "./rateLimiter";
+import { PaymentMethod } from "../types/commerce";
 
 function jsonResponse(status: number, data: unknown, originHeader?: string): ApiServerResponse {
   const isAllowed = validateOrigin(originHeader);
@@ -17,7 +19,7 @@ function jsonResponse(status: number, data: unknown, originHeader?: string): Api
       "Content-Type": "application/json",
       "Access-Control-Allow-Origin": allowedOrigin,
       "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
-      "Access-Control-Allow-Headers": "Content-Type, Authorization, Stripe-Signature",
+      "Access-Control-Allow-Headers": "Content-Type, Authorization, Stripe-Signature, X-PayFast-Signature",
       "X-Content-Type-Options": "nosniff",
       "Vary": "Origin",
     },
@@ -51,7 +53,7 @@ export async function handleApiRequest(req: ApiServerRequest): Promise<ApiServer
       headers: {
         "Access-Control-Allow-Origin": originHeader || "https://mukangowaafrica.com",
         "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
-        "Access-Control-Allow-Headers": "Content-Type, Authorization, Stripe-Signature",
+        "Access-Control-Allow-Headers": "Content-Type, Authorization, Stripe-Signature, X-PayFast-Signature",
         "Access-Control-Max-Age": "86400",
         "Vary": "Origin",
       },
@@ -74,12 +76,22 @@ export async function handleApiRequest(req: ApiServerRequest): Promise<ApiServer
   if (pathname === "/api/health" && req.method === "GET") {
     const paymentStatus = PaymentProviderManager.getProviderStatus();
     const dbStatus = ProductionOrderStore.isDatabaseConfigured();
+    const dbPing = dbStatus.configured ? await ProductionOrderStore.getInstance().pingDatabase() : undefined;
+    const emailConfigured = EmailDeliveryProvider.isConfigured();
+
     return jsonResponse(200, {
       status: "healthy",
       service: "Mukango Wa Africa Storefront API",
+      authoritativeCurrency: "ZAR",
       timestamp: new Date().toISOString(),
       providers: paymentStatus,
-      database: dbStatus,
+      database: {
+        ...dbStatus,
+        ping: dbPing,
+      },
+      email: {
+        configured: emailConfigured,
+      },
     }, originHeader);
   }
 
@@ -129,13 +141,22 @@ export async function handleApiRequest(req: ApiServerRequest): Promise<ApiServer
     return jsonResponse(200, { success: true, order }, originHeader);
   }
 
-  // --- POST /api/webhooks/payment ---
-  if (pathname === "/api/webhooks/payment" && req.method === "POST") {
-    const signature = Array.isArray(req.headers["stripe-signature"])
-      ? req.headers["stripe-signature"][0]
-      : req.headers["stripe-signature"];
+  // --- POST /api/webhooks/payment or /api/webhooks/payfast ---
+  if ((pathname === "/api/webhooks/payment" || pathname === "/api/webhooks/payfast") && req.method === "POST") {
+    const requestedProvider = (searchParams.get("provider") || (pathname.includes("payfast") ? "payfast" : "stripe")) as PaymentMethod;
+    
+    let signature: string | undefined;
+    if (requestedProvider === "stripe") {
+      signature = Array.isArray(req.headers["stripe-signature"])
+        ? req.headers["stripe-signature"][0]
+        : req.headers["stripe-signature"];
+    } else {
+      signature = Array.isArray(req.headers["x-payfast-signature"])
+        ? req.headers["x-payfast-signature"][0]
+        : req.headers["x-payfast-signature"];
+    }
 
-    const verification = await PaymentProviderManager.verifyWebhookEvent("stripe", req.rawBody || "", signature);
+    const verification = await PaymentProviderManager.verifyWebhookEvent(requestedProvider, req.rawBody || "", signature);
 
     if (!verification.verified) {
       return jsonResponse(400, { error: verification.error || "Webhook verification failed." }, originHeader);
@@ -146,10 +167,18 @@ export async function handleApiRequest(req: ApiServerRequest): Promise<ApiServer
     }
 
     if (verification.orderReference && verification.paymentStatus === "paid") {
-      await orderStore.updateStatus(verification.orderReference, "paid", `Payment verified via webhook [${verification.eventId}]`);
+      await orderStore.updateStatus(verification.orderReference, "paid", `Payment verified via ${requestedProvider} webhook [${verification.eventId}]`);
+
+      // Dispatch order confirmation email on successful payment
+      const order = await orderStore.getOrderByReference(verification.orderReference);
+      if (order) {
+        EmailDeliveryProvider.sendOrderConfirmation(order).catch((err) => {
+          console.warn("Could not dispatch paid order confirmation email:", err);
+        });
+      }
     }
 
-    return jsonResponse(200, { received: true, eventId: verification.eventId }, originHeader);
+    return jsonResponse(200, { received: true, eventId: verification.eventId, paymentStatus: verification.paymentStatus }, originHeader);
   }
 
   // --- POST /api/forms/contact ---

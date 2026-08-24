@@ -4,7 +4,7 @@ import { SEO } from "../components/common/SEO";
 import { Breadcrumbs } from "../components/common/Breadcrumbs";
 import { Button } from "../components/common/Button";
 import { CartItemRow } from "../components/cart/CartItemRow";
-import { formatPrice } from "../utils/currency";
+import { formatCurrency } from "../utils/currency";
 import { useToast } from "../context/ToastContext";
 import { ShoppingBag, ArrowRight, ShieldCheck, Tag } from "lucide-react";
 
@@ -107,27 +107,27 @@ export const CartPage: React.FC<CartPageProps> = ({ onNavigate }) => {
                 <div className="space-y-3 text-xs text-stone-700 font-light">
                   <div className="flex justify-between">
                     <span>Items Subtotal:</span>
-                    <span className="font-medium text-[#2D2A26]">{formatPrice(pricing.subtotal)}</span>
+                    <span className="font-medium text-[#2D2A26]">{formatCurrency(pricing.subtotal, pricing.currency)}</span>
                   </div>
                   <div className="flex justify-between">
                     <span>Phytosanitary Crated Freight:</span>
-                    <span className="font-medium text-[#2D2A26]">{formatPrice(pricing.shippingEstimate)}</span>
+                    <span className="font-medium text-[#2D2A26]">{formatCurrency(pricing.shippingEstimate, pricing.currency)}</span>
                   </div>
                   <div className="flex justify-between">
                     <span>Maritime/Air Transit Insurance:</span>
-                    <span className="font-medium text-[#2D2A26]">{formatPrice(pricing.insuranceAndHandling)}</span>
+                    <span className="font-medium text-[#2D2A26]">{formatCurrency(pricing.insuranceAndHandling, pricing.currency)}</span>
                   </div>
 
                   {pricing.appliedDiscount && (
                     <div className="flex justify-between text-emerald-700 font-medium">
                       <span>Inaugural Privilege:</span>
-                      <span>-{formatPrice(pricing.appliedDiscount.amount)}</span>
+                      <span>-{formatCurrency(pricing.appliedDiscount.amount, pricing.currency)}</span>
                     </div>
                   )}
 
                   <div className="pt-3 border-t border-[#D4B896]/30 flex justify-between text-base font-serif text-[#4F2607] font-semibold">
                     <span>Estimated Total:</span>
-                    <span>{formatPrice(pricing.total)}</span>
+                    <span>{formatCurrency(pricing.total, pricing.currency)}</span>
                   </div>
                 </div>
 

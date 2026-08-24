@@ -34,7 +34,7 @@ describe("SEO & Sitemap Validation", () => {
     expect(() => generateSitemapXml("")).toThrowError(/SITE_URL is required/);
   });
 
-  it("generates valid Product JSON-LD with schema.org specifications", () => {
+  it("generates valid Product JSON-LD with schema.org specifications and authoritative ZAR pricing", () => {
     const product = PRODUCTS[0];
     const jsonLdStr = generateProductJsonLd(product, "https://mukangowaafrica.com");
     const parsed = JSON.parse(jsonLdStr);
@@ -42,8 +42,15 @@ describe("SEO & Sitemap Validation", () => {
     expect(parsed["@type"]).toBe("Product");
     expect(parsed.name).toBe(product.name);
     expect(parsed.brand.name).toBe("Mukango Wa Africa");
-    expect(parsed.offers.price).toBe(product.basePriceUsd.toFixed(2));
+    expect(parsed.offers.priceCurrency).toBe("ZAR");
+    expect(parsed.offers.price).toBe((product.basePriceUsd * 18.5).toFixed(2));
     expect(parsed.countryOfOrigin.name).toBe("Zambia");
+
+    // Also supports explicit USD
+    const usdJsonLd = generateProductJsonLd(product, "https://mukangowaafrica.com", "USD");
+    const parsedUsd = JSON.parse(usdJsonLd);
+    expect(parsedUsd.offers.priceCurrency).toBe("USD");
+    expect(parsedUsd.offers.price).toBe(product.basePriceUsd.toFixed(2));
   });
 
   it("generates valid Breadcrumbs & Organization JSON-LD schemas", () => {

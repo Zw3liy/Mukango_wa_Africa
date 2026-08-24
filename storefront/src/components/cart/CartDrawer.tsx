@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useCart } from "../../context/CartContext";
 import { CartItemRow } from "./CartItemRow";
 import { Button } from "../common/Button";
-import { formatPrice } from "../../utils/currency";
+import { formatCurrency } from "../../utils/currency";
 import { X, ShoppingBag, ShieldCheck, ArrowRight, Tag } from "lucide-react";
 import { useToast } from "../../context/ToastContext";
 
@@ -158,7 +158,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({ onNavigate }) => {
                 {pricing.appliedDiscount && (
                   <div className="mt-2 p-2 bg-emerald-50 text-emerald-800 rounded text-xs flex items-center justify-between">
                     <span>Code {pricing.appliedDiscount.code} applied (10% off)</span>
-                    <span className="font-semibold">-{formatPrice(pricing.appliedDiscount.amount)}</span>
+                    <span className="font-semibold">-{formatCurrency(pricing.appliedDiscount.amount, pricing.currency)}</span>
                   </div>
                 )}
               </div>
@@ -172,25 +172,25 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({ onNavigate }) => {
             <div className="space-y-1.5 text-xs text-stone-600">
               <div className="flex justify-between">
                 <span>Items Subtotal:</span>
-                <span className="font-medium text-[#2D2A26]">{formatPrice(pricing.subtotal)}</span>
+                <span className="font-medium text-[#2D2A26]">{formatCurrency(pricing.subtotal, pricing.currency)}</span>
               </div>
               <div className="flex justify-between">
                 <span>Insured Crated Freight:</span>
-                <span className="font-medium text-[#2D2A26]">{formatPrice(pricing.shippingEstimate)}</span>
+                <span className="font-medium text-[#2D2A26]">{formatCurrency(pricing.shippingEstimate, pricing.currency)}</span>
               </div>
               <div className="flex justify-between">
                 <span>Insurance & Transit Handling:</span>
-                <span className="font-medium text-[#2D2A26]">{formatPrice(pricing.insuranceAndHandling)}</span>
+                <span className="font-medium text-[#2D2A26]">{formatCurrency(pricing.insuranceAndHandling, pricing.currency)}</span>
               </div>
               {pricing.appliedDiscount && (
                 <div className="flex justify-between text-emerald-700 font-medium">
                   <span>Inaugural Privilege:</span>
-                  <span>-{formatPrice(pricing.appliedDiscount.amount)}</span>
+                  <span>-{formatCurrency(pricing.appliedDiscount.amount, pricing.currency)}</span>
                 </div>
               )}
               <div className="pt-2 border-t border-[#D4B896]/30 flex justify-between text-base font-serif text-[#4F2607] font-semibold">
                 <span>Estimated Total:</span>
-                <span>{formatPrice(pricing.total)}</span>
+                <span>{formatCurrency(pricing.total, pricing.currency)}</span>
               </div>
             </div>
 

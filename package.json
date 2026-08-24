@@ -1,0 +1,19 @@
+{
+  "name": "mukango-wa-africa",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Mukango Wa Africa — Canonical Production Storefront for Handcrafted Zambian Hardwood Furniture",
+  "workspaces": [
+    "storefront"
+  ],
+  "scripts": {
+    "dev": "npm --workspace=storefront run dev",
+    "build": "npm --workspace=storefront run build",
+    "preview": "npm --workspace=storefront run preview",
+    "test": "npm --workspace=storefront run test",
+    "test:watch": "npm --workspace=storefront run test:watch",
+    "lint": "npm --workspace=storefront run lint",
+    "typecheck": "npm --workspace=storefront run typecheck",
+    "check": "npm --workspace=storefront run check"
+  }
+}

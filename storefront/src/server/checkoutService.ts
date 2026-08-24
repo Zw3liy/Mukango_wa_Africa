@@ -3,15 +3,18 @@ import { CreateCheckoutSessionRequest, CreateCheckoutSessionResponse, OrderRecor
 import { validateCartServerSide } from "./cartValidator";
 import { orderStore } from "./orderStore";
 import { PaymentProviderManager } from "./paymentProvider";
+import { EmailDeliveryProvider } from "./emailProvider";
 import { isValidEmail, isValidPhone, sanitizeText } from "../utils/sanitize";
 
 export async function processCheckoutSession(
   request: CreateCheckoutSessionRequest,
   siteBaseUrl: string
 ): Promise<CreateCheckoutSessionResponse> {
-  // 1. Authoritative Cart Validation
+  // 1. Authoritative Cart Validation (defaults to ZAR)
   const cartValidation = validateCartServerSide({
     items: request.items,
+    promoCode: request.promoCode,
+    currency: request.currency,
   });
 
   if (!cartValidation.isValid || cartValidation.authoritativeItems.length === 0) {
@@ -154,7 +157,12 @@ export async function processCheckoutSession(
     };
   }
 
+  // If wire transfer or bespoke invoice, trigger pro-forma confirmation email asynchronously
   if (request.paymentMethod === "wire_transfer" || request.paymentMethod === "bespoke_invoice") {
+    EmailDeliveryProvider.sendOrderConfirmation(orderRecord).catch((err) => {
+      console.warn("Could not dispatch pro-forma confirmation email:", err);
+    });
+
     return {
       orderId,
       reference,

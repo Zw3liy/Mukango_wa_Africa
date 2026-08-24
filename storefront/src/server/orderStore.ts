@@ -11,8 +11,8 @@ export interface OrderStore {
   recordWebhookEvent(eventId: string, provider: string, metadata?: Record<string, unknown>): Promise<boolean>;
 }
 
-// In-memory test store used ONLY during automated test runs when explicitly allowed
-class TestMemoryOrderStore implements OrderStore {
+// In-memory test store used during automated test runs or explicit test fallback
+export class TestMemoryOrderStore implements OrderStore {
   private orders = new Map<string, OrderRecord>();
   private webhooks = new Set<string>();
 
@@ -70,7 +70,7 @@ export class ProductionOrderStore implements OrderStore {
   private testStore: TestMemoryOrderStore | null = null;
 
   private constructor() {
-    // If in test mode and no DATABASE_URL is set, allow explicit test memory store
+    // If in test mode or explicitly allowed, initialize test memory store fallback
     if (process.env.NODE_ENV === "test" || process.env.ALLOW_TEST_MEMORY_STORE === "true") {
       this.testStore = new TestMemoryOrderStore();
     }
@@ -93,8 +93,29 @@ export class ProductionOrderStore implements OrderStore {
     }
     return {
       configured: true,
-      message: "DATABASE_URL configured.",
+      message: "DATABASE_URL configured for PostgreSQL durable storage.",
     };
+  }
+
+  /**
+   * Health diagnostic check to ping the database and measure latency.
+   */
+  public async pingDatabase(): Promise<{ ok: boolean; latencyMs?: number; error?: string }> {
+    const pool = this.getPool();
+    if (!pool) {
+      return { ok: false, error: "Database pool uninitialized (DATABASE_URL not set)." };
+    }
+
+    const start = Date.now();
+    try {
+      await pool.query("SELECT 1 AS health_check");
+      return { ok: true, latencyMs: Date.now() - start };
+    } catch (err) {
+      return {
+        ok: false,
+        error: err instanceof Error ? err.message : "Database ping query failed.",
+      };
+    }
   }
 
   private getPool(): pg.Pool | null {
@@ -103,12 +124,19 @@ export class ProductionOrderStore implements OrderStore {
     if (!dbUrl || !dbUrl.trim()) return null;
 
     try {
+      const isLocal = dbUrl.includes("localhost") || dbUrl.includes("127.0.0.1");
       this.pool = new pg.Pool({
         connectionString: dbUrl,
-        ssl: dbUrl.includes("localhost") || dbUrl.includes("127.0.0.1") ? false : { rejectUnauthorized: false },
+        ssl: isLocal ? false : { rejectUnauthorized: false },
         max: 10,
+        connectionTimeoutMillis: 5000,
         idleTimeoutMillis: 30000,
       });
+
+      this.pool.on("error", (err) => {
+        console.error("Unexpected error on idle PostgreSQL client pool:", err);
+      });
+
       return this.pool;
     } catch (err) {
       console.error("Failed to initialize database pool:", err);
@@ -125,11 +153,25 @@ export class ProductionOrderStore implements OrderStore {
           reference VARCHAR(64) UNIQUE NOT NULL,
           status VARCHAR(32) NOT NULL,
           customer_email VARCHAR(255) NOT NULL,
-          total_usd NUMERIC(12, 2) NOT NULL,
+          total_amount NUMERIC(12, 2) NOT NULL,
+          currency VARCHAR(8) NOT NULL DEFAULT 'ZAR',
           data JSONB NOT NULL,
           created_at TIMESTAMPTZ NOT NULL,
           updated_at TIMESTAMPTZ NOT NULL
         );
+
+        -- Backward-compatibility migration if table existed previously
+        DO $$
+        BEGIN
+          IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name = 'mukango_orders') THEN
+            IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'mukango_orders' AND column_name = 'total_amount') THEN
+              ALTER TABLE mukango_orders ADD COLUMN total_amount NUMERIC(12, 2) DEFAULT 0;
+            END IF;
+            IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'mukango_orders' AND column_name = 'currency') THEN
+              ALTER TABLE mukango_orders ADD COLUMN currency VARCHAR(8) DEFAULT 'ZAR';
+            END IF;
+          END IF;
+        END $$;
 
         CREATE TABLE IF NOT EXISTS mukango_webhook_events (
           event_id VARCHAR(128) PRIMARY KEY,
@@ -139,6 +181,9 @@ export class ProductionOrderStore implements OrderStore {
         );
 
         CREATE INDEX IF NOT EXISTS idx_mukango_orders_ref ON mukango_orders(reference);
+        CREATE INDEX IF NOT EXISTS idx_mukango_orders_email ON mukango_orders(customer_email);
+        CREATE INDEX IF NOT EXISTS idx_mukango_orders_status ON mukango_orders(status);
+        CREATE INDEX IF NOT EXISTS idx_mukango_orders_created ON mukango_orders(created_at DESC);
       `);
       this.tablesInitialized = true;
       return true;
@@ -170,11 +215,16 @@ export class ProductionOrderStore implements OrderStore {
         return { success: false, error: "Database schema verification failed." };
       }
 
+      const totalAmount = order.pricing.total;
+      const currency = order.pricing.currency || "ZAR";
+
       await pool.query(
-        `INSERT INTO mukango_orders (id, reference, status, customer_email, total_usd, data, created_at, updated_at)
-         VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+        `INSERT INTO mukango_orders (id, reference, status, customer_email, total_amount, currency, data, created_at, updated_at)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
          ON CONFLICT (id) DO UPDATE SET
            status = EXCLUDED.status,
+           total_amount = EXCLUDED.total_amount,
+           currency = EXCLUDED.currency,
            data = EXCLUDED.data,
            updated_at = EXCLUDED.updated_at`,
         [
@@ -182,7 +232,8 @@ export class ProductionOrderStore implements OrderStore {
           order.reference,
           order.status,
           order.customer.email,
-          order.pricing.total,
+          totalAmount,
+          currency,
           JSON.stringify(order),
           order.createdAt,
           order.updatedAt,
