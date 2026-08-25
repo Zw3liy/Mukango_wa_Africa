@@ -319,7 +319,12 @@ export class PaymentProviderManager {
       const signedPayload = `${timestamp}.${rawPayload}`;
       const expectedSignature = crypto.createHmac("sha256", secret).update(signedPayload).digest("hex");
 
-      if (expectedSignature !== signature) {
+      const providedBuffer = Buffer.from(signature, "utf8");
+      const expectedBuffer = Buffer.from(expectedSignature, "utf8");
+      const signatureValid =
+        providedBuffer.length === expectedBuffer.length && crypto.timingSafeEqual(providedBuffer, expectedBuffer);
+
+      if (!signatureValid) {
         return {
           verified: false,
           isDuplicate: false,
@@ -381,14 +386,46 @@ export class PaymentProviderManager {
           });
         }
 
-        const pfPaymentId = params.pf_payment_id || `pf_${Date.now()}`;
+        const pfPaymentId = params.pf_payment_id || "";
         const orderReference = params.m_payment_id;
         const paymentStatus = params.payment_status?.toUpperCase() === "COMPLETE" ? "paid" : "pending";
         const incomingSignature = params.signature;
 
-        // If passphrase or key is configured, verify signature
+        if (!pfPaymentId) {
+          return { verified: false, isDuplicate: false, error: "PayFast ITN payload is missing pf_payment_id." };
+        }
+
+        // --- Merchant verification: the notification must belong to OUR merchant account ---
+        const expectedMerchantId = process.env.PAYFAST_MERCHANT_ID;
+        if (!expectedMerchantId) {
+          return {
+            verified: false,
+            isDuplicate: false,
+            error: "PAYFAST_MERCHANT_ID is not configured; cannot verify ITN origin.",
+          };
+        }
+        if (params.merchant_id !== expectedMerchantId) {
+          return {
+            verified: false,
+            isDuplicate: false,
+            error: "PayFast ITN merchant_id does not match the configured merchant account.",
+          };
+        }
+
+        // --- Signature verification (fail-closed) ---
+        // If a passphrase is configured, every ITN MUST carry a valid MD5 signature.
+        // If an incoming signature is present but no passphrase is configured, we cannot
+        // verify it, so the notification is rejected (fail-closed boundary).
         const passphrase = process.env.PAYFAST_PASSPHRASE;
-        if (incomingSignature && passphrase) {
+        if (passphrase || incomingSignature) {
+          if (!incomingSignature || !passphrase) {
+            return {
+              verified: false,
+              isDuplicate: false,
+              error: "PayFast ITN signature verification is not possible (missing signature or passphrase).",
+            };
+          }
+
           let paramString = Object.entries(params)
             .filter(([k]) => k !== "signature")
             .map(([k, v]) => `${k}=${encodeURIComponent(v.trim()).replace(/%20/g, "+")}`)
@@ -396,11 +433,61 @@ export class PaymentProviderManager {
           paramString += `&passphrase=${encodeURIComponent(passphrase.trim()).replace(/%20/g, "+")}`;
           const expectedSig = crypto.createHash("md5").update(paramString).digest("hex");
 
-          if (expectedSig !== incomingSignature) {
+          const sigBuffer = Buffer.from(incomingSignature, "utf8");
+          const expectedBuffer = Buffer.from(expectedSig, "utf8");
+          const signatureValid =
+            sigBuffer.length === expectedBuffer.length && crypto.timingSafeEqual(sigBuffer, expectedBuffer);
+
+          if (!signatureValid) {
             return {
               verified: false,
               isDuplicate: false,
               error: "Invalid PayFast ITN signature.",
+            };
+          }
+        }
+
+        // --- Amount & currency verification for paid notifications ---
+        // Never mark an order paid on a notification whose amount or currency disagrees
+        // with the authoritative server-side order total.
+        if (paymentStatus === "paid") {
+          if (!orderReference) {
+            return {
+              verified: false,
+              isDuplicate: false,
+              error: "PayFast ITN is missing m_payment_id order reference.",
+            };
+          }
+
+          const order = await orderStore.getOrderByReference(orderReference);
+          if (!order) {
+            return {
+              verified: false,
+              isDuplicate: false,
+              error: "PayFast ITN references an unknown order.",
+            };
+          }
+
+          const notifiedCurrency = (params.currency || "").toUpperCase();
+          const orderCurrency = (order.pricing.currency || "ZAR").toUpperCase();
+          if (notifiedCurrency && notifiedCurrency !== orderCurrency) {
+            return {
+              verified: false,
+              isDuplicate: false,
+              error: `PayFast ITN currency mismatch: notification '${notifiedCurrency}' vs order '${orderCurrency}'.`,
+            };
+          }
+
+          const notifiedAmount = Number.parseFloat(params.amount_gross ?? "");
+          const authoritativeAmountCents = Math.round(order.pricing.total * 100);
+          if (
+            isNaN(notifiedAmount) ||
+            Math.round(notifiedAmount * 100) !== authoritativeAmountCents
+          ) {
+            return {
+              verified: false,
+              isDuplicate: false,
+              error: "PayFast ITN amount_gross does not match the authoritative order total.",
             };
           }
         }

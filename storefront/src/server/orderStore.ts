@@ -1,4 +1,4 @@
-import { OrderRecord } from "../types/order";
+import { OrderRecord, CreateCheckoutSessionResponse } from "../types/order";
 import { OrderStatus } from "../types/commerce";
 import pg from "pg";
 
@@ -9,12 +9,15 @@ export interface OrderStore {
   updateStatus(reference: string, status: OrderStatus, note: string): Promise<boolean>;
   hasProcessedWebhookEvent(eventId: string): Promise<boolean>;
   recordWebhookEvent(eventId: string, provider: string, metadata?: Record<string, unknown>): Promise<boolean>;
+  getIdempotencyRecord(key: string): Promise<CreateCheckoutSessionResponse | null>;
+  recordIdempotency(key: string, response: CreateCheckoutSessionResponse): Promise<boolean>;
 }
 
 // In-memory test store used during automated test runs or explicit test fallback
 export class TestMemoryOrderStore implements OrderStore {
   private orders = new Map<string, OrderRecord>();
   private webhooks = new Set<string>();
+  private idempotency = new Map<string, CreateCheckoutSessionResponse>();
 
   public async saveOrder(order: OrderRecord): Promise<{ success: boolean; error?: string }> {
     if (!order.id || !order.reference) {
@@ -57,9 +60,19 @@ export class TestMemoryOrderStore implements OrderStore {
     return true;
   }
 
+  public async getIdempotencyRecord(key: string): Promise<CreateCheckoutSessionResponse | null> {
+    return this.idempotency.get(key) || null;
+  }
+
+  public async recordIdempotency(key: string, response: CreateCheckoutSessionResponse): Promise<boolean> {
+    this.idempotency.set(key, response);
+    return true;
+  }
+
   public clear(): void {
     this.orders.clear();
     this.webhooks.clear();
+    this.idempotency.clear();
   }
 }
 
@@ -178,6 +191,13 @@ export class ProductionOrderStore implements OrderStore {
           provider VARCHAR(32) NOT NULL,
           processed_at TIMESTAMPTZ NOT NULL,
           metadata JSONB
+        );
+
+        CREATE TABLE IF NOT EXISTS mukango_checkout_idempotency (
+          idempotency_key VARCHAR(128) PRIMARY KEY,
+          order_reference VARCHAR(64) NOT NULL,
+          response JSONB NOT NULL,
+          created_at TIMESTAMPTZ NOT NULL
         );
 
         CREATE INDEX IF NOT EXISTS idx_mukango_orders_ref ON mukango_orders(reference);
@@ -377,6 +397,59 @@ export class ProductionOrderStore implements OrderStore {
       return true;
     } catch (err) {
       console.error("Database query error recording webhook event:", err);
+      return false;
+    }
+  }
+
+  public async getIdempotencyRecord(key: string): Promise<CreateCheckoutSessionResponse | null> {
+    if (!key) return null;
+
+    const pool = this.getPool();
+    if (!pool) {
+      if (this.testStore) {
+        return this.testStore.getIdempotencyRecord(key);
+      }
+      // Fail-closed: without durable storage we cannot guarantee duplicate
+      // protection, so an idempotent replay lookup reports "no record".
+      return null;
+    }
+
+    try {
+      await this.ensureTablesExist(pool);
+      const res = await pool.query(
+        `SELECT response FROM mukango_checkout_idempotency WHERE idempotency_key = $1 LIMIT 1`,
+        [key]
+      );
+      if (res.rows.length === 0) return null;
+      return typeof res.rows[0].response === "string" ? JSON.parse(res.rows[0].response) : res.rows[0].response;
+    } catch (err) {
+      console.error("Database query error reading checkout idempotency record:", err);
+      return null;
+    }
+  }
+
+  public async recordIdempotency(key: string, response: CreateCheckoutSessionResponse): Promise<boolean> {
+    if (!key || !response?.reference) return false;
+
+    const pool = this.getPool();
+    if (!pool) {
+      if (this.testStore) {
+        return this.testStore.recordIdempotency(key, response);
+      }
+      return false;
+    }
+
+    try {
+      await this.ensureTablesExist(pool);
+      await pool.query(
+        `INSERT INTO mukango_checkout_idempotency (idempotency_key, order_reference, response, created_at)
+         VALUES ($1, $2, $3, $4)
+         ON CONFLICT (idempotency_key) DO NOTHING`,
+        [key, response.reference, JSON.stringify(response), new Date().toISOString()]
+      );
+      return true;
+    } catch (err) {
+      console.error("Database query error recording checkout idempotency:", err);
       return false;
     }
   }

@@ -65,8 +65,10 @@ export const ShippingPage: React.FC = () => {
               <div className="p-4 bg-[#FAF9F6] rounded border border-[#D4B896]/20">
                 <strong className="block text-xs uppercase tracking-wider text-[#4F2607] mb-1">
                   Europe & United Kingdom
-                 air freight (5–7 days) or consolidated ocean freight via Walvis Bay / Durban (25–35 days).
                 </strong>
+                <p className="text-xs text-stone-600">
+                  Priority air freight (5–7 days) or consolidated ocean freight via Walvis Bay / Durban (25–35 days).
+                </p>
               </div>
               <div className="p-4 bg-[#FAF9F6] rounded border border-[#D4B896]/20">
                 <strong className="block text-xs uppercase tracking-wider text-[#4F2607] mb-1">

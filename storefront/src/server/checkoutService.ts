@@ -6,10 +6,30 @@ import { PaymentProviderManager } from "./paymentProvider";
 import { EmailDeliveryProvider } from "./emailProvider";
 import { isValidEmail, isValidPhone, sanitizeText } from "../utils/sanitize";
 
+// Duplicate-submission protection: clients may supply an idempotency key so that
+// retries (network failures, double-clicks, browser resubmits) return the original
+// order instead of creating duplicates. Only well-formed keys are honoured.
+const IDEMPOTENCY_KEY_PATTERN = /^[A-Za-z0-9_-]{8,128}$/;
+
+export function normalizeIdempotencyKey(rawKey: unknown): string | null {
+  if (typeof rawKey !== "string") return null;
+  const key = rawKey.trim();
+  return IDEMPOTENCY_KEY_PATTERN.test(key) ? key : null;
+}
+
 export async function processCheckoutSession(
   request: CreateCheckoutSessionRequest,
   siteBaseUrl: string
 ): Promise<CreateCheckoutSessionResponse> {
+  // 0. Idempotent replay check (duplicate-submission protection)
+  const idempotencyKey = normalizeIdempotencyKey(request.idempotencyKey);
+  if (idempotencyKey) {
+    const replayed = await orderStore.getIdempotencyRecord(idempotencyKey);
+    if (replayed) {
+      return replayed;
+    }
+  }
+
   // 1. Authoritative Cart Validation (defaults to ZAR)
   const cartValidation = validateCartServerSide({
     items: request.items,
@@ -163,20 +183,34 @@ export async function processCheckoutSession(
       console.warn("Could not dispatch pro-forma confirmation email:", err);
     });
 
-    return {
+    const invoiceResponse: CreateCheckoutSessionResponse = {
       orderId,
       reference,
       status: "invoice_created",
       invoiceInstructions: paymentResult.invoiceInstructions,
       pricingAuthoritative: cartValidation.pricing,
     };
+
+    // Cache successful outcome so retried submissions return the same order
+    if (idempotencyKey) {
+      await orderStore.recordIdempotency(idempotencyKey, invoiceResponse);
+    }
+
+    return invoiceResponse;
   }
 
-  return {
+  const redirectResponse: CreateCheckoutSessionResponse = {
     orderId,
     reference,
     status: "redirect_required",
     redirectUrl: paymentResult.redirectUrl,
     pricingAuthoritative: cartValidation.pricing,
   };
+
+  // Cache successful outcome so retried submissions return the same order
+  if (idempotencyKey) {
+    await orderStore.recordIdempotency(idempotencyKey, redirectResponse);
+  }
+
+  return redirectResponse;
 }

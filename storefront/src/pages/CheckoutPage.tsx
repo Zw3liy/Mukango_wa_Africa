@@ -12,9 +12,26 @@ interface CheckoutPageProps {
   onNavigate?: (path: string) => void;
 }
 
+/**
+ * Generates a fresh client-side idempotency key for a checkout attempt.
+ * The server honours the key so that accidental double submissions or
+ * network retries return the original order instead of creating duplicates.
+ */
+function generateIdempotencyKey(): string {
+  try {
+    if (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function") {
+      return crypto.randomUUID();
+    }
+  } catch {
+    // fall through to manual key
+  }
+  return `chk_${Date.now()}_${Math.random().toString(36).slice(2, 14)}`;
+}
+
 export const CheckoutPage: React.FC<CheckoutPageProps> = ({ onNavigate }) => {
   const { items, pricing, clearCart } = useCart();
   const { showToast } = useToast();
+  const [idempotencyKey, setIdempotencyKey] = useState<string>(() => generateIdempotencyKey());
 
   const [customer, setCustomer] = useState({
     firstName: "",
@@ -68,6 +85,7 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ onNavigate }) => {
       customer,
       shippingAddress,
       paymentMethod,
+      idempotencyKey,
     };
 
     try {
@@ -80,13 +98,17 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ onNavigate }) => {
       const data = await response.json();
 
       if (response.ok && data.status === "redirect_required" && data.redirectUrl) {
-        // Redirect to external Stripe / PayFast gateway
+        // Redirect to external Stripe / PayFast gateway. The order is already
+        // durably recorded server-side; rotate the idempotency key so any future
+        // commission starts a fresh checkout attempt.
+        setIdempotencyKey(generateIdempotencyKey());
         window.location.href = data.redirectUrl;
         return;
       }
 
       if (response.ok && data.status === "invoice_created") {
         // Wire transfer / Invoice Pro-forma
+        setIdempotencyKey(generateIdempotencyKey());
         clearCart();
         const confirmUrl = `/checkout/confirmation?ref=${data.reference}&orderId=${data.orderId}`;
         if (onNavigate) {
@@ -149,10 +171,11 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ onNavigate }) => {
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-[11px] uppercase tracking-wider text-stone-600 mb-1">
+                  <label htmlFor="co-first-name" className="block text-[11px] uppercase tracking-wider text-stone-600 mb-1">
                     First Name *
                   </label>
                   <input
+                    id="co-first-name"
                     type="text"
                     required
                     value={customer.firstName}
@@ -162,10 +185,11 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ onNavigate }) => {
                 </div>
 
                 <div>
-                  <label className="block text-[11px] uppercase tracking-wider text-stone-600 mb-1">
+                  <label htmlFor="co-last-name" className="block text-[11px] uppercase tracking-wider text-stone-600 mb-1">
                     Last Name *
                   </label>
                   <input
+                    id="co-last-name"
                     type="text"
                     required
                     value={customer.lastName}
@@ -177,10 +201,11 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ onNavigate }) => {
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-[11px] uppercase tracking-wider text-stone-600 mb-1">
+                  <label htmlFor="co-email" className="block text-[11px] uppercase tracking-wider text-stone-600 mb-1">
                     Email Address *
                   </label>
                   <input
+                    id="co-email"
                     type="email"
                     required
                     value={customer.email}
@@ -190,10 +215,11 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ onNavigate }) => {
                 </div>
 
                 <div>
-                  <label className="block text-[11px] uppercase tracking-wider text-stone-600 mb-1">
+                  <label htmlFor="co-phone" className="block text-[11px] uppercase tracking-wider text-stone-600 mb-1">
                     Phone / WhatsApp *
                   </label>
                   <input
+                    id="co-phone"
                     type="tel"
                     required
                     value={customer.phone}
@@ -205,10 +231,11 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ onNavigate }) => {
               </div>
 
               <div>
-                <label className="block text-[11px] uppercase tracking-wider text-stone-600 mb-1">
+                <label htmlFor="co-company" className="block text-[11px] uppercase tracking-wider text-stone-600 mb-1">
                   Estate / Lodge / Company Name (Optional)
                 </label>
                 <input
+                    id="co-company"
                   type="text"
                   value={customer.company}
                   onChange={(e) => setCustomer({ ...customer, company: e.target.value })}
@@ -224,10 +251,11 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ onNavigate }) => {
               </h3>
 
               <div>
-                <label className="block text-[11px] uppercase tracking-wider text-stone-600 mb-1">
+                <label htmlFor="co-street1" className="block text-[11px] uppercase tracking-wider text-stone-600 mb-1">
                   Street Address Line 1 *
                 </label>
                 <input
+                    id="co-street1"
                   type="text"
                   required
                   value={shippingAddress.streetLine1}
@@ -239,10 +267,11 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ onNavigate }) => {
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-[11px] uppercase tracking-wider text-stone-600 mb-1">
+                  <label htmlFor="co-city" className="block text-[11px] uppercase tracking-wider text-stone-600 mb-1">
                     City *
                   </label>
                   <input
+                    id="co-city"
                     type="text"
                     required
                     value={shippingAddress.city}
@@ -252,10 +281,11 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ onNavigate }) => {
                 </div>
 
                 <div>
-                  <label className="block text-[11px] uppercase tracking-wider text-stone-600 mb-1">
+                  <label htmlFor="co-state" className="block text-[11px] uppercase tracking-wider text-stone-600 mb-1">
                     State / Province / Region
                   </label>
                   <input
+                    id="co-state"
                     type="text"
                     value={shippingAddress.stateProvince}
                     onChange={(e) => setShippingAddress({ ...shippingAddress, stateProvince: e.target.value })}
@@ -266,10 +296,11 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ onNavigate }) => {
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-[11px] uppercase tracking-wider text-stone-600 mb-1">
+                  <label htmlFor="co-postal" className="block text-[11px] uppercase tracking-wider text-stone-600 mb-1">
                     Postal / ZIP Code *
                   </label>
                   <input
+                    id="co-postal"
                     type="text"
                     required
                     value={shippingAddress.postalCode}
@@ -279,10 +310,11 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ onNavigate }) => {
                 </div>
 
                 <div>
-                  <label className="block text-[11px] uppercase tracking-wider text-stone-600 mb-1">
+                  <label htmlFor="co-country" className="block text-[11px] uppercase tracking-wider text-stone-600 mb-1">
                     Country *
                   </label>
                   <input
+                    id="co-country"
                     type="text"
                     required
                     value={shippingAddress.country}
@@ -324,7 +356,7 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ onNavigate }) => {
                       </span>
                     </div>
                     <p className="text-xs font-light text-stone-600 mt-1">
-                      Generates an official Pro-Forma invoice with First National Bank / Standard Chartered Lusaka SWIFT coordinates.
+                      Generates an official Pro-Forma invoice with our verified corporate SWIFT banking coordinates.
                     </p>
                   </div>
                 </label>
