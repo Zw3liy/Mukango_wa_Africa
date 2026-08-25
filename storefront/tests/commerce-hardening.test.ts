@@ -211,7 +211,10 @@ describe("Commerce Hardening — PayFast ITN, Idempotency & Email Safety", () =>
     const first = await postPayFastItn(itn);
     expect(first.status).toBe(200);
     expect(JSON.parse(first.body).paymentStatus).toBe("paid");
-    expect((await orderStore.getOrderByReference(reference))?.status).toBe("paid");
+    const paidOrder = await orderStore.getOrderByReference(reference);
+    expect(paidOrder?.status).toBe("paid");
+    // Exactly one 'paid' timeline entry — status transitions must never be double-recorded
+    expect(paidOrder?.timeline.filter((t) => t.status === "paid")).toHaveLength(1);
 
     // Replay must be detected and must not reprocess
     const replay = await postPayFastItn(itn);

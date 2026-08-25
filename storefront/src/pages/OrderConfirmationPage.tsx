@@ -1,9 +1,10 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { SEO } from "../components/common/SEO";
 import { Button } from "../components/common/Button";
 import { OrderRecord } from "../types/order";
-import { CheckCircle2, Building2, Printer, FileText, Mail } from "lucide-react";
+import { CheckCircle2, Building2, Printer, FileText, Mail, Clock3 } from "lucide-react";
 import { formatCurrency } from "../utils/currency";
+import { useCart } from "../context/CartContext";
 
 interface OrderConfirmationPageProps {
   reference?: string;
@@ -17,6 +18,8 @@ export const OrderConfirmationPage: React.FC<OrderConfirmationPageProps> = ({
   onNavigate,
 }) => {
   const [order, setOrder] = useState<OrderRecord | null>(null);
+  const { clearCart } = useCart();
+  const cartClearedForOrder = useRef<string | null>(null);
 
   const activeRef = reference || (typeof window !== "undefined" ? new URLSearchParams(window.location.search).get("ref") : null);
   const activeOrderId = orderId || (typeof window !== "undefined" ? new URLSearchParams(window.location.search).get("orderId") : null);
@@ -26,24 +29,56 @@ export const OrderConfirmationPage: React.FC<OrderConfirmationPageProps> = ({
       return;
     }
 
-    const fetchOrder = async () => {
+    let cancelled = false;
+    let attempts = 0;
+    const maxAttempts = 10; // ~30s of polling for the verified payment notification
+
+    const fetchOrder = async (): Promise<OrderRecord | null> => {
       try {
         const res = await fetch(`/api/checkout/order-status?ref=${encodeURIComponent(activeRef)}`);
         if (res.ok) {
           const json = await res.json();
           if (json.order) {
-            setOrder(json.order);
+            return json.order as OrderRecord;
           }
         }
       } catch {
-        // ignore
+        // transient network issue — retry on next poll
+      }
+      return null;
+    };
+
+    const poll = async () => {
+      attempts += 1;
+      const fetched = await fetchOrder();
+      if (cancelled) return;
+      if (fetched) {
+        setOrder(fetched);
+        // Payment status is only ever set to 'paid' by a server-verified gateway
+        // notification — never by the browser redirect itself.
+        if (fetched.status === "paid") {
+          if (cartClearedForOrder.current !== fetched.reference) {
+            cartClearedForOrder.current = fetched.reference;
+            clearCart();
+          }
+          return; // verified state reached — stop polling
+        }
+      }
+      if (attempts < maxAttempts) {
+        timer = window.setTimeout(poll, 3000);
       }
     };
 
-    fetchOrder();
-  }, [activeRef]);
+    let timer = window.setTimeout(poll, 0);
+    return () => {
+      cancelled = true;
+      window.clearTimeout(timer);
+    };
+  }, [activeRef, clearCart]);
 
   const displayOrderId = order?.id || activeOrderId || "Pending Reference";
+  const isPaid = order?.status === "paid";
+  const isAwaitingPayment = order ? order.status === "draft" || order.status === "pending_payment" || order.status === "payment_authorized" : false;
 
   return (
     <div className="py-16 bg-[#FAF9F6] min-h-screen">
@@ -67,12 +102,39 @@ export const OrderConfirmationPage: React.FC<OrderConfirmationPageProps> = ({
           </h1>
 
           <p className="text-sm font-light text-stone-600 max-w-md mx-auto leading-relaxed mb-6">
-            Thank you for commissioning an heirloom with Mukango Wa Africa. Your order has been placed in our atelier production queue.
+            Thank you for commissioning an heirloom with Mukango Wa Africa. Your order has been recorded in the atelier master register.
           </p>
 
-          <div className="inline-block p-3 px-6 bg-[#F7F5F0] rounded border border-[#D4B896] font-mono text-sm text-[#4F2607] mb-8">
+          <div className="inline-block p-3 px-6 bg-[#F7F5F0] rounded border border-[#D4B896] font-mono text-sm text-[#4F2607] mb-6">
             Order ID: <strong>{displayOrderId}</strong>
           </div>
+
+          {/* Server-authoritative payment status (only gateway-verified notifications set 'paid') */}
+          {order && (
+            <div className="mb-8" role="status">
+              {isPaid ? (
+                <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-medium">
+                  <CheckCircle2 className="w-4 h-4" />
+                  Payment Verified — Commission Confirmed
+                </span>
+              ) : isAwaitingPayment ? (
+                <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-amber-50 border border-amber-200 text-amber-800 text-xs font-medium">
+                  <Clock3 className="w-4 h-4" />
+                  Awaiting Payment Confirmation
+                </span>
+              ) : (
+                <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-stone-50 border border-stone-200 text-stone-700 text-xs font-medium uppercase tracking-wider">
+                  Status: {order.status.replace(/_/g, " ")}
+                </span>
+              )}
+              {isAwaitingPayment && (
+                <p className="text-[11px] font-light text-stone-500 mt-2 max-w-md mx-auto leading-relaxed">
+                  This page refreshes automatically. Your commission is marked paid only when our
+                  payment gateway confirms the transaction server-side — never by the browser redirect alone.
+                </p>
+              )}
+            </div>
+          )}
 
           {/* Wire Instructions / Pro-Forma Notice Box */}
           <div className="text-left bg-[#FAF9F6] p-6 sm:p-8 rounded border border-[#D4B896]/40 mb-8 space-y-4">

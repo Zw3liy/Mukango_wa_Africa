@@ -320,6 +320,14 @@ export class ProductionOrderStore implements OrderStore {
   }
 
   public async updateStatus(reference: string, status: OrderStatus, note: string): Promise<boolean> {
+    const pool = this.getPool();
+    if (!pool) {
+      if (this.testStore) {
+        return this.testStore.updateStatus(reference, status, note);
+      }
+      return false;
+    }
+
     const order = await this.getOrderByReference(reference);
     if (!order) return false;
 
@@ -330,14 +338,6 @@ export class ProductionOrderStore implements OrderStore {
       status,
       note,
     });
-
-    const pool = this.getPool();
-    if (!pool) {
-      if (this.testStore) {
-        return this.testStore.updateStatus(reference, status, note);
-      }
-      return false;
-    }
 
     try {
       await pool.query(

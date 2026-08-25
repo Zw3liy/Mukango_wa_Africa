@@ -59,9 +59,14 @@ export default defineConfig({
   server: {
     host: "0.0.0.0",
     port: 5173,
+    // Allow preview/proxy hosts (e.g. sandboxed .e2b.app previews) to reach the
+    // dev server. Security boundaries (CORS origin checks, payload limits and
+    // rate limiting) are enforced inside the API router itself.
+    allowedHosts: true,
   },
   preview: {
     host: "0.0.0.0",
     port: 4173,
+    allowedHosts: true,
   },
 });
