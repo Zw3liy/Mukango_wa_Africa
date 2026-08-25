@@ -78,7 +78,11 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
                 </div>
               ) : (
                 <form onSubmit={handleNewsletter} className="flex flex-col sm:flex-row gap-2">
+                  <label htmlFor="footer-newsletter-email" className="sr-only">
+                    Email address for the Mukango Collectors Circle newsletter
+                  </label>
                   <input
+                    id="footer-newsletter-email"
                     type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}

@@ -134,8 +134,12 @@ export const CartPage: React.FC<CartPageProps> = ({ onNavigate }) => {
                 {/* Promo Code Form */}
                 <form onSubmit={handleApplyPromo} className="flex gap-2 pt-2 border-t border-stone-100">
                   <div className="relative flex-1">
-                    <Tag className="w-3.5 h-3.5 text-stone-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                    <Tag className="w-3.5 h-3.5 text-stone-400 absolute left-3 top-1/2 -translate-y-1/2" aria-hidden="true" />
+                    <label htmlFor="cart-promo-code" className="sr-only">
+                      Promotional code
+                    </label>
                     <input
+                      id="cart-promo-code"
                       type="text"
                       value={promoCode}
                       onChange={(e) => setPromoCode(e.target.value)}

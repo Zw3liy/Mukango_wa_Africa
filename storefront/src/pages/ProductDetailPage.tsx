@@ -152,13 +152,14 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ slug, onNa
 
               {/* Optional Custom Engraving */}
               <div className="py-5 border-b border-[#D4B896]/30">
-                <label className="block text-xs uppercase tracking-wider text-[#4F2607] font-semibold mb-1">
+                <label htmlFor="pdp-custom-engraving" className="block text-xs uppercase tracking-wider text-[#4F2607] font-semibold mb-1">
                   Custom Atelier Inscription (Optional)
                 </label>
                 <p className="text-[11px] font-light text-stone-500 mb-2">
                   Hand-engraved on the underside brass plate (e.g. "For the Mwila Estate, 2026").
                 </p>
                 <input
+                  id="pdp-custom-engraving"
                   type="text"
                   maxLength={50}
                   value={engravingText}

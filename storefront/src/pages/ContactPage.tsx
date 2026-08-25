@@ -162,6 +162,7 @@ export const ContactPage: React.FC = () => {
                 <input
                   type="text"
                   name="botField"
+                  aria-hidden="true"
                   value={formData.botField}
                   onChange={(e) => setFormData({ ...formData, botField: e.target.value })}
                   className="hidden"
@@ -175,10 +176,11 @@ export const ContactPage: React.FC = () => {
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-xs uppercase tracking-wider text-stone-700 font-medium mb-1.5">
+                    <label htmlFor="ct-name" className="block text-xs uppercase tracking-wider text-stone-700 font-medium mb-1.5">
                       Full Name *
                     </label>
                     <input
+                        id="ct-name"
                       type="text"
                       required
                       value={formData.name}
@@ -189,10 +191,11 @@ export const ContactPage: React.FC = () => {
                   </div>
 
                   <div>
-                    <label className="block text-xs uppercase tracking-wider text-stone-700 font-medium mb-1.5">
+                    <label htmlFor="ct-email" className="block text-xs uppercase tracking-wider text-stone-700 font-medium mb-1.5">
                       Email Address *
                     </label>
                     <input
+                        id="ct-email"
                       type="email"
                       required
                       value={formData.email}
@@ -205,10 +208,11 @@ export const ContactPage: React.FC = () => {
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-xs uppercase tracking-wider text-stone-700 font-medium mb-1.5">
+                    <label htmlFor="ct-phone" className="block text-xs uppercase tracking-wider text-stone-700 font-medium mb-1.5">
                       Phone Number
                     </label>
                     <input
+                        id="ct-phone"
                       type="tel"
                       value={formData.phone}
                       onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
@@ -218,10 +222,11 @@ export const ContactPage: React.FC = () => {
                   </div>
 
                   <div>
-                    <label className="block text-xs uppercase tracking-wider text-stone-700 font-medium mb-1.5">
+                    <label htmlFor="ct-enquiry" className="block text-xs uppercase tracking-wider text-stone-700 font-medium mb-1.5">
                       Enquiry Nature
                     </label>
                     <select
+                        id="ct-enquiry"
                       value={formData.enquiryType}
                       onChange={(e) => setFormData({ ...formData, enquiryType: e.target.value })}
                       className="w-full text-xs p-3 bg-white border border-[#D4B896] rounded text-[#2D2A26] focus:outline-hidden focus:border-[#4F2607]"
@@ -235,10 +240,11 @@ export const ContactPage: React.FC = () => {
                 </div>
 
                 <div>
-                  <label className="block text-xs uppercase tracking-wider text-stone-700 font-medium mb-1.5">
-                    Subject *
+                  <label htmlFor="ct-subject" className="block text-xs uppercase tracking-wider text-stone-700 font-medium mb-1.5">
+                      Subject *
                   </label>
                   <input
+                        id="ct-subject"
                     type="text"
                     required
                     value={formData.subject}
@@ -249,10 +255,11 @@ export const ContactPage: React.FC = () => {
                 </div>
 
                 <div>
-                  <label className="block text-xs uppercase tracking-wider text-stone-700 font-medium mb-1.5">
-                    Message *
+                  <label htmlFor="ct-message" className="block text-xs uppercase tracking-wider text-stone-700 font-medium mb-1.5">
+                      Message *
                   </label>
                   <textarea
+                        id="ct-message"
                     rows={5}
                     required
                     value={formData.message}

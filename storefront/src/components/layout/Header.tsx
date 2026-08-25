@@ -149,8 +149,12 @@ export const Header: React.FC<HeaderProps> = ({ currentPath = "/", onNavigate })
             <div className="mt-3 pt-3 border-t border-[#D4B896]/30 animate-fade-in">
               <form onSubmit={handleSearchSubmit} className="flex items-center gap-2 max-w-xl mx-auto">
                 <div className="relative flex-1">
-                  <Search className="w-4 h-4 text-stone-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                  <Search className="w-4 h-4 text-stone-400 absolute left-3.5 top-1/2 -translate-y-1/2" aria-hidden="true" />
+                  <label htmlFor="site-search-input" className="sr-only">
+                    Search the catalogue
+                  </label>
                   <input
+                    id="site-search-input"
                     type="text"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
