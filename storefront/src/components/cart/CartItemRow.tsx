@@ -35,7 +35,7 @@ export const CartItemRow: React.FC<CartItemRowProps> = ({ item }) => {
           </span>
         </div>
 
-        <p className="text-xs text-[#8B6F47] font-light mt-0.5">
+        <p className="text-xs text-[#7A6039] font-light mt-0.5">
           Finish: {selectedFinish.name}
         </p>
 

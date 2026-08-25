@@ -102,7 +102,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ slug, onNa
                 {product.name}
               </h1>
 
-              <p className="text-xs uppercase tracking-widest text-[#8B6F47] font-semibold mb-4">
+              <p className="text-xs uppercase tracking-widest text-[#7A6039] font-semibold mb-4">
                 {product.timber} • SKU: {product.sku}
               </p>
 
@@ -120,7 +120,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ slug, onNa
               {/* Finish Selection */}
               <div className="py-5 border-b border-[#D4B896]/30">
                 <label className="block text-xs uppercase tracking-wider text-[#4F2607] font-semibold mb-2">
-                  Selected Wood Finish: <span className="text-[#8B6F47] font-normal">{selectedFinish.name}</span>
+                  Selected Wood Finish: <span className="text-[#7A6039] font-normal">{selectedFinish.name}</span>
                 </label>
                 <div className="grid grid-cols-2 gap-2 mt-2">
                   {WOOD_FINISHES.map((finish) => {
@@ -152,13 +152,14 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ slug, onNa
 
               {/* Optional Custom Engraving */}
               <div className="py-5 border-b border-[#D4B896]/30">
-                <label className="block text-xs uppercase tracking-wider text-[#4F2607] font-semibold mb-1">
+                <label htmlFor="pdp-custom-engraving" className="block text-xs uppercase tracking-wider text-[#4F2607] font-semibold mb-1">
                   Custom Atelier Inscription (Optional)
                 </label>
                 <p className="text-[11px] font-light text-stone-500 mb-2">
                   Hand-engraved on the underside brass plate (e.g. "For the Mwila Estate, 2026").
                 </p>
                 <input
+                  id="pdp-custom-engraving"
                   type="text"
                   maxLength={50}
                   value={engravingText}
@@ -171,7 +172,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ slug, onNa
               {/* Stock / Lead Time Alert */}
               <div className="py-4 flex items-center justify-between text-xs text-stone-600 font-light">
                 <div className="flex items-center gap-1.5">
-                  <Clock className="w-4 h-4 text-[#8B6F47]" />
+                  <Clock className="w-4 h-4 text-[#7A6039]" />
                   <span>
                     {product.inStockCount > 0
                       ? `${product.inStockCount} in quick-ship stock`
@@ -232,15 +233,15 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ slug, onNa
             {/* Atelier Credibility Icons */}
             <div className="p-4 bg-[#F7F5F0] rounded border border-[#D4B896]/30 grid grid-cols-3 gap-2 text-center text-[10px] text-stone-600 font-light">
               <div className="flex flex-col items-center gap-1">
-                <Trees className="w-4 h-4 text-[#8B6F47]" />
+                <Trees className="w-4 h-4 text-[#7A6039]" />
                 <span>100% Solid Zambezi Teak</span>
               </div>
               <div className="flex flex-col items-center gap-1">
-                <Award className="w-4 h-4 text-[#8B6F47]" />
+                <Award className="w-4 h-4 text-[#7A6039]" />
                 <span>Signed Master Certificate</span>
               </div>
               <div className="flex flex-col items-center gap-1">
-                <ShieldCheck className="w-4 h-4 text-[#8B6F47]" />
+                <ShieldCheck className="w-4 h-4 text-[#7A6039]" />
                 <span>25-Year Guarantee</span>
               </div>
             </div>

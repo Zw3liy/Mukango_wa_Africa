@@ -18,7 +18,7 @@ export const CraftsmanshipPage: React.FC = () => {
 
         {/* Page Header */}
         <div className="py-12 max-w-3xl mx-auto text-center mb-16">
-          <span className="text-xs uppercase tracking-[0.2em] text-[#8B6F47] font-semibold block mb-2">
+          <span className="text-xs uppercase tracking-[0.2em] text-[#7A6039] font-semibold block mb-2">
             The Science & Spirit of Wood
           </span>
           <h1 className="font-serif text-4xl sm:text-5xl lg:text-6xl text-[#4F2607] font-light mb-6">
@@ -33,7 +33,7 @@ export const CraftsmanshipPage: React.FC = () => {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-24">
           <div className="p-8 bg-white rounded border border-[#D4B896]/30 shadow-subtle flex flex-col justify-between">
             <div>
-              <Sun className="w-8 h-8 text-[#8B6F47] mb-4" />
+              <Sun className="w-8 h-8 text-[#7A6039] mb-4" />
               <h3 className="font-serif text-xl text-[#4F2607] font-normal mb-3">
                 Solar Kiln Seasoning
               </h3>
@@ -41,14 +41,14 @@ export const CraftsmanshipPage: React.FC = () => {
                 Raw timber contains up to 45% moisture. We cure our boards in specialized solar-assisted kilns for 120 days until core moisture stabilizes at 8–10%. This prevents splitting, shrinking, or warping in European heating or tropical humidity.
               </p>
             </div>
-            <div className="mt-6 pt-4 border-t border-stone-100 text-[11px] font-medium text-[#8B6F47] uppercase tracking-wider">
+            <div className="mt-6 pt-4 border-t border-stone-100 text-[11px] font-medium text-[#7A6039] uppercase tracking-wider">
               8–10% Equilibrium Moisture
             </div>
           </div>
 
           <div className="p-8 bg-white rounded border border-[#D4B896]/30 shadow-subtle flex flex-col justify-between">
             <div>
-              <Hammer className="w-8 h-8 text-[#8B6F47] mb-4" />
+              <Hammer className="w-8 h-8 text-[#7A6039] mb-4" />
               <h3 className="font-serif text-xl text-[#4F2607] font-normal mb-3">
                 All-Wood Mortise & Tenon
               </h3>
@@ -56,14 +56,14 @@ export const CraftsmanshipPage: React.FC = () => {
                 We reject metal screws and mechanical brackets in all load-bearing frames. Interlocking through-tenons pegged with African Blackwood move naturally with the wood fibers over centuries.
               </p>
             </div>
-            <div className="mt-6 pt-4 border-t border-stone-100 text-[11px] font-medium text-[#8B6F47] uppercase tracking-wider">
+            <div className="mt-6 pt-4 border-t border-stone-100 text-[11px] font-medium text-[#7A6039] uppercase tracking-wider">
               100% Structural Wood Joinery
             </div>
           </div>
 
           <div className="p-8 bg-white rounded border border-[#D4B896]/30 shadow-subtle flex flex-col justify-between">
             <div>
-              <Flame className="w-8 h-8 text-[#8B6F47] mb-4" />
+              <Flame className="w-8 h-8 text-[#7A6039] mb-4" />
               <h3 className="font-serif text-xl text-[#4F2607] font-normal mb-3">
                 Organic Beeswax & Linseed
               </h3>
@@ -71,7 +71,7 @@ export const CraftsmanshipPage: React.FC = () => {
                 Rather than suffocating the wood under thick synthetic plastics, we rub each piece with five coats of cold-pressed linseed oil and pure Zambian wild honey beeswax. The wood breathes, self-heals minor scratches, and matures gracefully.
               </p>
             </div>
-            <div className="mt-6 pt-4 border-t border-stone-100 text-[11px] font-medium text-[#8B6F47] uppercase tracking-wider">
+            <div className="mt-6 pt-4 border-t border-stone-100 text-[11px] font-medium text-[#7A6039] uppercase tracking-wider">
               Non-Toxic Natural Patina
             </div>
           </div>
@@ -80,7 +80,7 @@ export const CraftsmanshipPage: React.FC = () => {
         {/* Indigenous Timber Registry */}
         <div className="mb-24">
           <div className="text-center max-w-xl mx-auto mb-12">
-            <span className="text-xs uppercase tracking-widest text-[#8B6F47] font-medium block mb-1">
+            <span className="text-xs uppercase tracking-widest text-[#7A6039] font-medium block mb-1">
               Botanical Registry
             </span>
             <h2 className="font-serif text-3xl text-[#4F2607] font-light">
@@ -100,7 +100,7 @@ export const CraftsmanshipPage: React.FC = () => {
                       <h3 className="font-serif text-2xl text-[#4F2607] font-normal">
                         {timber.name}
                       </h3>
-                      <p className="text-xs font-mono text-[#8B6F47] italic">
+                      <p className="text-xs font-mono text-[#7A6039] italic">
                         {timber.botanicalName}
                       </p>
                     </div>

@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { FOOTER_SHOP_LINKS, FOOTER_COMPANY_LINKS, FOOTER_LEGAL_LINKS } from "../../data/navigation";
 import { Mail, Phone, MapPin, ArrowRight, CheckCircle2, Shield } from "lucide-react";
 import { useToast } from "../../context/ToastContext";
+import { scrollToTop } from "../../utils/scroll";
 
 interface FooterProps {
   onNavigate?: (path: string) => void;
@@ -17,7 +18,7 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
     if (onNavigate) {
       e.preventDefault();
       onNavigate(href);
-      window.scrollTo({ top: 0, behavior: "smooth" });
+      scrollToTop();
     }
   };
 
@@ -78,7 +79,11 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
                 </div>
               ) : (
                 <form onSubmit={handleNewsletter} className="flex flex-col sm:flex-row gap-2">
+                  <label htmlFor="footer-newsletter-email" className="sr-only">
+                    Email address for the Mukango Collectors Circle newsletter
+                  </label>
                   <input
+                    id="footer-newsletter-email"
                     type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}

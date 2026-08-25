@@ -1,10 +1,12 @@
 import { OrderRecord } from "../types/order";
 import { formatCurrency } from "../utils/currency";
+import { escapeHtml } from "../utils/sanitize";
 
 export interface SendEmailPayload {
   to: string;
   subject: string;
   htmlContent: string;
+  textContent?: string;
   replyTo?: string;
 }
 
@@ -61,6 +63,7 @@ export class EmailDeliveryProvider {
             to: payload.to,
             subject: payload.subject,
             html: payload.htmlContent,
+            ...(payload.textContent ? { text: payload.textContent } : {}),
             reply_to: payload.replyTo,
           }),
         });
@@ -106,9 +109,9 @@ export class EmailDeliveryProvider {
         (item) => `
           <tr style="border-bottom: 1px solid #e7e5e4;">
             <td style="padding: 12px 0;">
-              <strong style="color: #4F2607;">${item.product.name}</strong><br />
-              <span style="font-size: 12px; color: #78716c;">Finish: ${item.selectedFinish.name}${
-                item.customEngraving ? ` • Engraving: "${item.customEngraving}"` : ""
+              <strong style="color: #4F2607;">${escapeHtml(item.product.name)}</strong><br />
+              <span style="font-size: 12px; color: #78716c;">Finish: ${escapeHtml(item.selectedFinish.name)}${
+                item.customEngraving ? ` • Engraving: "${escapeHtml(item.customEngraving)}"` : ""
               }</span>
             </td>
             <td style="padding: 12px 0; text-align: center; color: #44403c;">${item.quantity}</td>
@@ -121,19 +124,34 @@ export class EmailDeliveryProvider {
       .join("");
 
     const isWire = order.payment.method === "wire_transfer" || order.payment.method === "bespoke_invoice";
+    // Bank coordinates are strictly configuration-driven. No fallback values are
+    // fabricated: if coordinates are missing the email states they will follow separately.
+    const hasBankCoordinates = Boolean(
+      process.env.BANK_NAME && process.env.BANK_ACCOUNT_NAME && process.env.BANK_ACCOUNT_NUMBER && process.env.BANK_SWIFT_CODE
+    );
     const bankSection = isWire
-      ? `
+      ? hasBankCoordinates
+        ? `
         <div style="background-color: #FAF9F6; border: 1px solid #D4B896; border-radius: 6px; padding: 16px; margin: 24px 0;">
           <h3 style="margin-top: 0; color: #4F2607; font-family: Georgia, serif; font-size: 16px;">Bank Wire / Pro-Forma Instructions</h3>
           <p style="font-size: 13px; color: #57534e; margin-bottom: 8px;">Please arrange swift transfer with the following details:</p>
           <table style="width: 100%; font-size: 13px; color: #292524;">
-            <tr><td><strong>Bank:</strong></td><td>${process.env.BANK_NAME || "Standard Chartered Bank Zambia PLC"}</td></tr>
-            <tr><td><strong>Account Name:</strong></td><td>${process.env.BANK_ACCOUNT_NAME || "Mukango Wa Africa Artisans Ltd"}</td></tr>
-            <tr><td><strong>Account Number:</strong></td><td>${process.env.BANK_ACCOUNT_NUMBER || "0100123456700"}</td></tr>
-            <tr><td><strong>SWIFT Code:</strong></td><td>${process.env.BANK_SWIFT_CODE || "SCBLZMLX"}</td></tr>
-            <tr><td><strong>Payment Reference:</strong></td><td>ORD-${order.id}</td></tr>
+            <tr><td><strong>Bank:</strong></td><td>${escapeHtml(process.env.BANK_NAME || "")}</td></tr>
+            <tr><td><strong>Account Name:</strong></td><td>${escapeHtml(process.env.BANK_ACCOUNT_NAME || "")}</td></tr>
+            <tr><td><strong>Account Number:</strong></td><td>${escapeHtml(process.env.BANK_ACCOUNT_NUMBER || "")}</td></tr>
+            <tr><td><strong>SWIFT Code:</strong></td><td>${escapeHtml(process.env.BANK_SWIFT_CODE || "")}</td></tr>
+            <tr><td><strong>Payment Reference:</strong></td><td>ORD-${escapeHtml(order.id)}</td></tr>
             <tr><td><strong>Amount Due:</strong></td><td><strong>${formatCurrency(order.pricing.total, currency)}</strong></td></tr>
           </table>
+        </div>
+      `
+        : `
+        <div style="background-color: #FAF9F6; border: 1px solid #D4B896; border-radius: 6px; padding: 16px; margin: 24px 0;">
+          <h3 style="margin-top: 0; color: #4F2607; font-family: Georgia, serif; font-size: 16px;">Bank Wire / Pro-Forma Instructions</h3>
+          <p style="font-size: 13px; color: #57534e; margin-bottom: 8px;">
+            Our verified corporate banking coordinates are being issued against your commission and will be confirmed by the atelier directly.
+            Payment Reference: ORD-${escapeHtml(order.id)} • Amount Due: ${formatCurrency(order.pricing.total, currency)}
+          </p>
         </div>
       `
       : "";
@@ -194,14 +212,88 @@ export class EmailDeliveryProvider {
   }
 
   /**
+   * Generates a plain-text fallback version of the commission confirmation.
+   * Both HTML and text variants are dispatched so every mail client renders
+   * the order record legibly (and recipients who disable HTML still receive it).
+   */
+  public static generateOrderConfirmationText(order: OrderRecord): string {
+    const currency = order.pricing.currency || "ZAR";
+    const lines: string[] = [
+      "MUKANGO WA AFRICA — ZAMBIAN HARDWOOD ATELIER",
+      "Plot 14, Kafue Road, Lusaka, Zambia",
+      "",
+      `Commission Confirmation #${order.id}`,
+      "",
+      `Dear ${order.customer.firstName} ${order.customer.lastName},`,
+      "",
+      "Thank you for commissioning an heirloom piece with Mukango Wa Africa.",
+      "Your order has been recorded in our master register.",
+      "",
+      "COMMISSIONED PIECES",
+      ...order.items.map((item) => {
+        const lineTotal = item.product.basePriceUsd * (currency === "ZAR" ? 18.5 : 1) * item.quantity;
+        const engraving = item.customEngraving ? ` (engraving: "${item.customEngraving}")` : "";
+        return `- ${item.product.name} | Finish: ${item.selectedFinish.name}${engraving} | Qty ${item.quantity} | ${formatCurrency(lineTotal, currency)}`;
+      }),
+      "",
+      `Subtotal: ${formatCurrency(order.pricing.subtotal, currency)}`,
+      `Phytosanitary Crated Freight: ${formatCurrency(order.pricing.shippingEstimate, currency)}`,
+      `Transit Insurance: ${formatCurrency(order.pricing.insuranceAndHandling, currency)}`,
+    ];
+
+    if (order.pricing.appliedDiscount) {
+      lines.push(`Privilege (${order.pricing.appliedDiscount.code}): -${formatCurrency(order.pricing.appliedDiscount.amount, currency)}`);
+    }
+
+    lines.push(`TOTAL: ${formatCurrency(order.pricing.total, currency)}`);
+    lines.push("");
+    lines.push(
+      `Delivery Destination: ${order.shippingAddress.streetLine1}, ${order.shippingAddress.city}, ${order.shippingAddress.country}`
+    );
+
+    const isWire = order.payment.method === "wire_transfer" || order.payment.method === "bespoke_invoice";
+    if (isWire) {
+      lines.push("");
+      lines.push("BANK WIRE / PRO-FORMA INSTRUCTIONS");
+      if (
+        process.env.BANK_NAME &&
+        process.env.BANK_ACCOUNT_NAME &&
+        process.env.BANK_ACCOUNT_NUMBER &&
+        process.env.BANK_SWIFT_CODE
+      ) {
+        lines.push(
+          `Bank: ${process.env.BANK_NAME}`,
+          `Account Name: ${process.env.BANK_ACCOUNT_NAME}`,
+          `Account Number: ${process.env.BANK_ACCOUNT_NUMBER}`,
+          `SWIFT Code: ${process.env.BANK_SWIFT_CODE}`
+        );
+      } else {
+        lines.push("Our verified corporate banking coordinates will be confirmed by the atelier directly.");
+      }
+      lines.push(`Payment Reference: ORD-${order.id}`);
+      lines.push(`Amount Due: ${formatCurrency(order.pricing.total, currency)}`);
+    }
+
+    lines.push(
+      "",
+      "Heirloom Guarantee: All timber pieces are certified for 25 years against structural joinery failure.",
+      "Questions? Contact the atelier at enquiries@mukangoafrica.co.za."
+    );
+
+    return lines.join("\n");
+  }
+
+  /**
    * Dispatches order confirmation email to patron.
    */
   public static async sendOrderConfirmation(order: OrderRecord): Promise<EmailDeliveryResult> {
     const htmlContent = this.generateOrderConfirmationHtml(order);
+    const textContent = this.generateOrderConfirmationText(order);
     return this.sendEmail({
       to: order.customer.email,
       subject: `[Mukango Wa Africa] Heirloom Commission Confirmation #${order.id}`,
       htmlContent,
+      textContent,
     });
   }
 }

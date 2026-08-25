@@ -41,7 +41,7 @@ This repository contains the canonical production storefront for **Mukango Wa Af
 │   │   ├── server/              # Server-side API router, cart validation, payment & order stores
 │   │   ├── types/               # TypeScript data models for commerce, products, forms
 │   │   └── utils/               # Sanitization, currency, SEO, and class merging
-│   ├── tests/                   # Automated Vitest test suite (60 unit & end-to-end tests)
+│   ├── tests/                   # Automated Vitest test suite (75 unit & end-to-end tests)
 │   ├── netlify.toml             # Storefront-specific Netlify configuration
 │   ├── package.json             # Locked storefront dependencies
 │   ├── tsconfig.json            # TypeScript configuration
@@ -61,15 +61,15 @@ This repository contains the canonical production storefront for **Mukango Wa Af
 
 ### Local Installation & Development
 ```bash
-# Navigate to the storefront directory
-cd storefront
-
-# Install locked dependencies
+# From the repository root (single root package-lock.json for the workspace)
 npm ci
 
-# Start the local development server
+# Start the local development server (root script proxies to the storefront workspace)
 npm run dev
 ```
+
+`npm ci` also works from inside `storefront/` — npm resolves the workspace
+root automatically and installs the same locked dependency tree.
 
 ### Complete Validation Pipeline
 ```bash
@@ -91,23 +91,25 @@ Create `.env` in `storefront/` based on `storefront/.env.example`:
 
 | Variable | Description | Example / Default |
 |---|---|---|
-| `SITE_URL` | Canonical production domain | `https://mukangowaafrica.com` |
+| `SITE_URL` | Canonical production domain | `https://mukangoafrica.co.za` |
 | `DEFAULT_CURRENCY` | Authoritative base currency code | `ZAR` |
 | `DATABASE_URL` | PostgreSQL connection string | `postgresql://user:pass@host:5432/mukango` |
-| `PAYFAST_MERCHANT_ID` | PayFast live merchant ID | `10000100` (sandbox) or live ID |
-| `PAYFAST_MERCHANT_KEY` | PayFast merchant key | `46f0cd694581a` (sandbox) or live key |
+| `PAYFAST_MERCHANT_ID` | PayFast live merchant ID | `10000100` (sandbox) or your live ID |
+| `PAYFAST_MERCHANT_KEY` | PayFast merchant key | `46f0cd694581a` (sandbox) or your live key |
 | `PAYFAST_PASSPHRASE` | PayFast security passphrase | `your_secret_passphrase` |
 | `PAYFAST_SANDBOX` | PayFast sandbox environment toggle | `false` in production, `true` for staging |
 | `STRIPE_SECRET_KEY` | Stripe secret key | `sk_live_...` (or `sk_test_...`) |
 | `STRIPE_PUBLISHABLE_KEY` | Stripe publishable key | `pk_live_...` |
 | `STRIPE_WEBHOOK_SECRET` | Stripe webhook signing secret | `whsec_...` |
-| `BANK_NAME` | Beneficiary bank name for wire payments | `Standard Chartered Bank Zambia PLC` |
-| `BANK_ACCOUNT_NAME` | Corporate account name | `Mukango Wa Africa Artisans Ltd` |
-| `BANK_ACCOUNT_NUMBER` | Corporate bank account number | `0100123456700` |
-| `BANK_SWIFT_CODE` | Corporate SWIFT/BIC routing code | `SCBLZMLX` |
+| `BANK_NAME` | Beneficiary bank name for wire pro-forma invoices | Your verified corporate bank name |
+| `BANK_ACCOUNT_NAME` | Corporate account name | Your verified corporate account name |
+| `BANK_ACCOUNT_NUMBER` | Corporate bank account number | Your verified corporate account number |
+| `BANK_SWIFT_CODE` | Corporate SWIFT/BIC routing code | Your verified SWIFT/BIC code |
 | `RESEND_API_KEY` | API key for transactional emails | `re_...` |
-| `CONTACT_RECEIVER_EMAIL` | Atelier recipient for inquiries | `enquiries@mukangowaafrica.com` |
-| `EMAIL_FROM` | Sender address for transactional emails | `Mukango Wa Africa <orders@mukangowaafrica.com>` |
+| `SMTP_HOST` / `SMTP_USER` | Optional alternative SMTP transport (if Resend unused) | `smtp.example.com` |
+| `CONTACT_RECEIVER_EMAIL` | Atelier recipient for inquiries | `enquiries@mukangoafrica.co.za` |
+| `EMAIL_FROM` | Sender address for transactional emails | `Mukango Wa Africa <orders@mukangoafrica.co.za>` |
+| `ALLOW_TEST_MEMORY_STORE` | Development/test only: permits in-memory order store fallback | `true` in local test runs, never in production |
 
 ---
 

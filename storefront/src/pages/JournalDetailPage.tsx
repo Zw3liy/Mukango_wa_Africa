@@ -48,7 +48,7 @@ export const JournalDetailPage: React.FC<JournalDetailPageProps> = ({ slug, onNa
 
         {/* Article Header */}
         <div className="py-8 text-center max-w-3xl mx-auto">
-          <div className="inline-flex items-center gap-3 text-xs uppercase tracking-[0.2em] text-[#8B6F47] font-semibold mb-3">
+          <div className="inline-flex items-center gap-3 text-xs uppercase tracking-[0.2em] text-[#7A6039] font-semibold mb-3">
             <span>{article.issueNumber}</span>
             <span>•</span>
             <span className="flex items-center gap-1">
@@ -67,11 +67,11 @@ export const JournalDetailPage: React.FC<JournalDetailPageProps> = ({ slug, onNa
 
           <div className="flex items-center justify-center gap-6 text-xs text-stone-500 font-light border-y border-[#D4B896]/30 py-3">
             <div className="flex items-center gap-1.5">
-              <User className="w-3.5 h-3.5 text-[#8B6F47]" />
+              <User className="w-3.5 h-3.5 text-[#7A6039]" />
               <span>{article.author.name} ({article.author.role})</span>
             </div>
             <div className="flex items-center gap-1.5">
-              <Calendar className="w-3.5 h-3.5 text-[#8B6F47]" />
+              <Calendar className="w-3.5 h-3.5 text-[#7A6039]" />
               <span>{article.publishedDate}</span>
             </div>
           </div>
@@ -92,7 +92,7 @@ export const JournalDetailPage: React.FC<JournalDetailPageProps> = ({ slug, onNa
         {/* Tags */}
         <div className="py-6 flex flex-wrap items-center justify-between gap-4">
           <div className="flex items-center gap-2">
-            <Tag className="w-4 h-4 text-[#8B6F47]" />
+            <Tag className="w-4 h-4 text-[#7A6039]" />
             <div className="flex flex-wrap gap-1.5">
               {article.tags.map((tag) => (
                 <span

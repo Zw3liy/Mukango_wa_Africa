@@ -1,6 +1,7 @@
 import React from "react";
 import { Button } from "../common/Button";
 import { ArrowRight, Compass, Sparkles } from "lucide-react";
+import { scrollToTop } from "../../utils/scroll";
 
 interface HeroSectionProps {
   onNavigate?: (path: string) => void;
@@ -10,7 +11,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onNavigate }) => {
   const handleNav = (href: string) => {
     if (onNavigate) {
       onNavigate(href);
-      window.scrollTo({ top: 0, behavior: "smooth" });
+      scrollToTop();
     } else {
       window.location.href = href;
     }

@@ -22,7 +22,7 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate }) => {
 
         {/* Hero Section */}
         <div className="py-12 max-w-3xl mx-auto text-center mb-16">
-          <span className="text-xs uppercase tracking-[0.2em] text-[#8B6F47] font-semibold block mb-2">
+          <span className="text-xs uppercase tracking-[0.2em] text-[#7A6039] font-semibold block mb-2">
             Origins & Heritage
           </span>
           <h1 className="font-serif text-4xl sm:text-5xl lg:text-6xl text-[#4F2607] font-light mb-6">
@@ -51,7 +51,7 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate }) => {
           </div>
 
           <div className="lg:col-span-6 space-y-6">
-            <span className="text-xs uppercase tracking-[0.2em] text-[#8B6F47] font-medium block">
+            <span className="text-xs uppercase tracking-[0.2em] text-[#7A6039] font-medium block">
               The Artisan's Calling
             </span>
             <h2 className="font-serif text-3xl sm:text-4xl text-[#4F2607] font-light leading-tight">
@@ -75,7 +75,7 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate }) => {
         {/* Core Values Grid */}
         <div className="py-16 border-t border-[#D4B896]/30 mb-20">
           <div className="text-center max-w-xl mx-auto mb-12">
-            <span className="text-xs uppercase tracking-widest text-[#8B6F47] font-medium block mb-1">
+            <span className="text-xs uppercase tracking-widest text-[#7A6039] font-medium block mb-1">
               Atelier Ethos
             </span>
             <h2 className="font-serif text-3xl text-[#4F2607] font-light">

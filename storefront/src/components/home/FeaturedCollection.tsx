@@ -3,6 +3,7 @@ import { PRODUCTS } from "../../data/products";
 import { ProductCard } from "../shop/ProductCard";
 import { ProductCategory } from "../../types/product";
 import { ArrowRight } from "lucide-react";
+import { scrollToTop } from "../../utils/scroll";
 
 interface FeaturedCollectionProps {
   onNavigate?: (path: string) => void;
@@ -26,7 +27,7 @@ export const FeaturedCollection: React.FC<FeaturedCollectionProps> = ({ onNaviga
   const handleViewAll = () => {
     if (onNavigate) {
       onNavigate("/shop");
-      window.scrollTo({ top: 0, behavior: "smooth" });
+      scrollToTop();
     } else {
       window.location.href = "/shop";
     }
@@ -38,7 +39,7 @@ export const FeaturedCollection: React.FC<FeaturedCollectionProps> = ({ onNaviga
         {/* Section Header */}
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
           <div>
-            <span className="text-xs uppercase tracking-[0.2em] text-[#8B6F47] font-medium block mb-2">
+            <span className="text-xs uppercase tracking-[0.2em] text-[#7A6039] font-medium block mb-2">
               Featured Works
             </span>
             <h2 className="font-serif text-3xl sm:text-4xl text-[#4F2607] font-light">
@@ -78,7 +79,7 @@ export const FeaturedCollection: React.FC<FeaturedCollectionProps> = ({ onNaviga
         <div className="text-center">
           <button
             onClick={handleViewAll}
-            className="inline-flex items-center gap-2 text-sm uppercase tracking-wider font-medium text-[#4F2607] hover:text-[#8B6F47] border-b-2 border-[#4F2607] hover:border-[#8B6F47] pb-1 transition"
+            className="inline-flex items-center gap-2 text-sm uppercase tracking-wider font-medium text-[#4F2607] hover:text-[#7A6039] border-b-2 border-[#4F2607] hover:border-[#8B6F47] pb-1 transition"
           >
             <span>Explore Complete {PRODUCTS.length}-Piece Atelier Catalogue</span>
             <ArrowRight className="w-4 h-4" />

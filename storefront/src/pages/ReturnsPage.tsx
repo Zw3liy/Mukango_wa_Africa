@@ -16,7 +16,7 @@ export const ReturnsPage: React.FC = () => {
         <Breadcrumbs items={[{ label: "25-Year Guarantee & Returns", href: "/returns" }]} />
 
         <div className="py-12 text-center max-w-2xl mx-auto mb-10">
-          <span className="text-xs uppercase tracking-[0.2em] text-[#8B6F47] font-semibold block mb-2">
+          <span className="text-xs uppercase tracking-[0.2em] text-[#7A6039] font-semibold block mb-2">
             The Mukango Promise
           </span>
           <h1 className="font-serif text-4xl sm:text-5xl text-[#4F2607] font-light mb-4">
@@ -30,7 +30,7 @@ export const ReturnsPage: React.FC = () => {
         <div className="space-y-8 bg-white p-8 md:p-10 rounded border border-[#D4B896]/30 shadow-subtle mb-16 text-sm font-light text-stone-700 leading-relaxed">
           <div>
             <h2 className="font-serif text-2xl text-[#4F2607] mb-3 flex items-center gap-2">
-              <ShieldCheck className="w-5 h-5 text-[#8B6F47]" />
+              <ShieldCheck className="w-5 h-5 text-[#7A6039]" />
               <span>What Is Covered</span>
             </h2>
             <ul className="list-disc list-inside space-y-2 pl-2">
@@ -42,7 +42,7 @@ export const ReturnsPage: React.FC = () => {
 
           <div className="pt-6 border-t border-stone-100">
             <h2 className="font-serif text-2xl text-[#4F2607] mb-3 flex items-center gap-2">
-              <Award className="w-5 h-5 text-[#8B6F47]" />
+              <Award className="w-5 h-5 text-[#7A6039]" />
               <span>Certificate of Authenticity & Registry</span>
             </h2>
             <p>
@@ -52,7 +52,7 @@ export const ReturnsPage: React.FC = () => {
 
           <div className="pt-6 border-t border-stone-100">
             <h2 className="font-serif text-2xl text-[#4F2607] mb-3 flex items-center gap-2">
-              <FileCheck className="w-5 h-5 text-[#8B6F47]" />
+              <FileCheck className="w-5 h-5 text-[#7A6039]" />
               <span>Returns & Transit Inspection Protocol</span>
             </h2>
             <p>

@@ -4,6 +4,11 @@
   functions = "netlify/functions"
   command = "npm run build"
 
+[build.environment]
+  # Pin the serverless runtime to the LTS line used in verification
+  NODE_VERSION = "22"
+  NPM_FLAGS = "--no-audit --no-fund"
+
 [[redirects]]
   from = "/api/*"
   to = "/.netlify/functions/api/:splat"

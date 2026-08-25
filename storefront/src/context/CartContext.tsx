@@ -51,10 +51,14 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return initialValidation.pricing;
   });
 
-  // Persist items to localStorage
+  // Persist items to localStorage (remove the record entirely when empty)
   useEffect(() => {
     try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
+      if (items.length === 0) {
+        localStorage.removeItem(STORAGE_KEY);
+      } else {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
+      }
     } catch {
       // Storage unavailable or disabled
     }

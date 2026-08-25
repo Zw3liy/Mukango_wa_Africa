@@ -3,6 +3,7 @@ import { MAIN_NAV } from "../../data/navigation";
 import { useCart } from "../../context/CartContext";
 import { ShoppingBag, Search, Menu, X } from "lucide-react";
 import { MobileNav } from "./MobileNav";
+import { scrollToTop } from "../../utils/scroll";
 
 interface HeaderProps {
   currentPath?: string;
@@ -29,7 +30,7 @@ export const Header: React.FC<HeaderProps> = ({ currentPath = "/", onNavigate })
       e.preventDefault();
       onNavigate(href);
       setIsMobileMenuOpen(false);
-      window.scrollTo({ top: 0, behavior: "smooth" });
+      scrollToTop();
     }
   };
 
@@ -82,7 +83,7 @@ export const Header: React.FC<HeaderProps> = ({ currentPath = "/", onNavigate })
                 <span className="font-serif text-xl sm:text-2xl font-light tracking-wide text-[#4F2607] leading-tight">
                   Mukango Wa Africa
                 </span>
-                <span className="text-[10px] tracking-[0.25em] uppercase font-light text-[#8B6F47]">
+                <span className="text-[10px] tracking-[0.25em] uppercase font-light text-[#7A6039]">
                   Zambian Hardwood Atelier
                 </span>
               </div>
@@ -149,8 +150,12 @@ export const Header: React.FC<HeaderProps> = ({ currentPath = "/", onNavigate })
             <div className="mt-3 pt-3 border-t border-[#D4B896]/30 animate-fade-in">
               <form onSubmit={handleSearchSubmit} className="flex items-center gap-2 max-w-xl mx-auto">
                 <div className="relative flex-1">
-                  <Search className="w-4 h-4 text-stone-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                  <Search className="w-4 h-4 text-stone-400 absolute left-3.5 top-1/2 -translate-y-1/2" aria-hidden="true" />
+                  <label htmlFor="site-search-input" className="sr-only">
+                    Search the catalogue
+                  </label>
                   <input
+                    id="site-search-input"
                     type="text"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}

@@ -110,7 +110,7 @@ export const ShopPage: React.FC<ShopPageProps> = ({
         {/* Page Header */}
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 py-8 border-b border-[#D4B896]/30 mb-8">
           <div>
-            <span className="text-xs uppercase tracking-[0.2em] text-[#8B6F47] font-semibold block mb-2">
+            <span className="text-xs uppercase tracking-[0.2em] text-[#7A6039] font-semibold block mb-2">
               Atelier Collections
             </span>
             <h1 className="font-serif text-3xl sm:text-5xl text-[#4F2607] font-light">

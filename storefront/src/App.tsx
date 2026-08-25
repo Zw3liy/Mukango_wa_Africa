@@ -30,6 +30,7 @@ import { CheckoutPage } from "./pages/CheckoutPage";
 import { OrderConfirmationPage } from "./pages/OrderConfirmationPage";
 import { OrderCancelPage } from "./pages/OrderCancelPage";
 import { NotFoundPage } from "./pages/NotFoundPage";
+import { scrollToTop } from "./utils/scroll";
 
 export const App: React.FC = () => {
   const [currentPath, setCurrentPath] = useState<string>(() => {
@@ -53,7 +54,7 @@ export const App: React.FC = () => {
     if (typeof window !== "undefined") {
       window.history.pushState({}, "", path);
       setCurrentPath(path);
-      window.scrollTo({ top: 0, behavior: "smooth" });
+      scrollToTop();
     }
   }, []);
 

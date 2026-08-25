@@ -6,10 +6,30 @@ import { PaymentProviderManager } from "./paymentProvider";
 import { EmailDeliveryProvider } from "./emailProvider";
 import { isValidEmail, isValidPhone, sanitizeText } from "../utils/sanitize";
 
+// Duplicate-submission protection: clients may supply an idempotency key so that
+// retries (network failures, double-clicks, browser resubmits) return the original
+// order instead of creating duplicates. Only well-formed keys are honoured.
+const IDEMPOTENCY_KEY_PATTERN = /^[A-Za-z0-9_-]{8,128}$/;
+
+export function normalizeIdempotencyKey(rawKey: unknown): string | null {
+  if (typeof rawKey !== "string") return null;
+  const key = rawKey.trim();
+  return IDEMPOTENCY_KEY_PATTERN.test(key) ? key : null;
+}
+
 export async function processCheckoutSession(
   request: CreateCheckoutSessionRequest,
   siteBaseUrl: string
 ): Promise<CreateCheckoutSessionResponse> {
+  // 0. Idempotent replay check (duplicate-submission protection)
+  const idempotencyKey = normalizeIdempotencyKey(request.idempotencyKey);
+  if (idempotencyKey) {
+    const replayed = await orderStore.getIdempotencyRecord(idempotencyKey);
+    if (replayed) {
+      return replayed;
+    }
+  }
+
   // 1. Authoritative Cart Validation (defaults to ZAR)
   const cartValidation = validateCartServerSide({
     items: request.items,
@@ -82,9 +102,17 @@ export async function processCheckoutSession(
   }
 
   // 4. Generate Order Identity
-  const orderNumber = Math.floor(1000 + Math.random() * 9000);
-  const orderId = `MWA-${new Date().getFullYear()}-${orderNumber}`;
-  const reference = crypto.randomBytes(16).toString("hex");
+  // Human-readable order id with a cryptographic uniqueness suffix so that
+  // concurrent commissions can never collide on the primary key.
+  const generateOrderIdentity = () => {
+    const orderNumber = Math.floor(1000 + Math.random() * 9000);
+    const uniqueness = crypto.randomBytes(2).toString("hex").toUpperCase();
+    return {
+      orderId: `MWA-${new Date().getFullYear()}-${orderNumber}-${uniqueness}`,
+      reference: crypto.randomBytes(16).toString("hex"),
+    };
+  };
+  let { orderId, reference } = generateOrderIdentity();
 
   const orderRecord: OrderRecord = {
     id: orderId,
@@ -122,8 +150,16 @@ export async function processCheckoutSession(
     ],
   };
 
-  // 5. Save Order to Durable Store
-  const saveResult = await orderStore.saveOrder(orderRecord);
+  // 5. Save Order to Durable Store (with identity-collision retry)
+  let saveResult = await orderStore.saveOrder(orderRecord);
+  let collisionRetries = 0;
+  while (!saveResult.success && saveResult.error === "ORDER_ID_COLLISION" && collisionRetries < 3) {
+    collisionRetries += 1;
+    ({ orderId, reference } = generateOrderIdentity());
+    orderRecord.id = orderId;
+    orderRecord.reference = reference;
+    saveResult = await orderStore.saveOrder(orderRecord);
+  }
   if (!saveResult.success) {
     return {
       orderId: "",
@@ -163,20 +199,34 @@ export async function processCheckoutSession(
       console.warn("Could not dispatch pro-forma confirmation email:", err);
     });
 
-    return {
+    const invoiceResponse: CreateCheckoutSessionResponse = {
       orderId,
       reference,
       status: "invoice_created",
       invoiceInstructions: paymentResult.invoiceInstructions,
       pricingAuthoritative: cartValidation.pricing,
     };
+
+    // Cache successful outcome so retried submissions return the same order
+    if (idempotencyKey) {
+      await orderStore.recordIdempotency(idempotencyKey, invoiceResponse);
+    }
+
+    return invoiceResponse;
   }
 
-  return {
+  const redirectResponse: CreateCheckoutSessionResponse = {
     orderId,
     reference,
     status: "redirect_required",
     redirectUrl: paymentResult.redirectUrl,
     pricingAuthoritative: cartValidation.pricing,
   };
+
+  // Cache successful outcome so retried submissions return the same order
+  if (idempotencyKey) {
+    await orderStore.recordIdempotency(idempotencyKey, redirectResponse);
+  }
+
+  return redirectResponse;
 }

@@ -7,7 +7,7 @@ export const TestimonialsSection: React.FC = () => {
     <section className="py-24 bg-[#F7F5F0] border-t border-[#D4B896]/30">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center max-w-xl mx-auto mb-16">
-          <span className="text-xs uppercase tracking-[0.2em] text-[#8B6F47] font-medium block mb-2">
+          <span className="text-xs uppercase tracking-[0.2em] text-[#7A6039] font-medium block mb-2">
             Patron Reflections
           </span>
           <h2 className="font-serif text-3xl sm:text-4xl text-[#4F2607] font-light">
@@ -42,7 +42,7 @@ export const TestimonialsSection: React.FC = () => {
               <div className="pt-4 border-t border-stone-100">
                 <p className="font-serif text-base font-normal text-[#4F2607]">{item.author}</p>
                 <p className="text-xs text-stone-500 font-light">{item.roleOrLocation}</p>
-                <span className="inline-block mt-2 text-[10px] uppercase tracking-wider px-2 py-0.5 bg-[#F7F5F0] text-[#8B6F47] rounded">
+                <span className="inline-block mt-2 text-[10px] uppercase tracking-wider px-2 py-0.5 bg-[#F7F5F0] text-[#7A6039] rounded">
                   {item.commissionType}
                 </span>
               </div>

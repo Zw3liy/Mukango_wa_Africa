@@ -22,7 +22,7 @@ export const Badge: React.FC<BadgeProps> = ({
 
   const variantStyles = {
     default: "bg-[#F7F5F0] text-[#4F2607] border border-[#D4B896]/40",
-    gold: "bg-[#D4B896]/20 text-[#8B6F47] border border-[#D4B896]",
+    gold: "bg-[#D4B896]/20 text-[#7A6039] border border-[#D4B896]",
     teak: "bg-[#8B6F47] text-[#FAF9F6]",
     charcoal: "bg-[#2D2A26] text-[#FAF9F6]",
     outline: "bg-transparent border border-current text-[#4F2607]",

@@ -78,7 +78,7 @@ export const ContactPage: React.FC = () => {
 
         {/* Page Title */}
         <div className="py-10 text-center max-w-2xl mx-auto mb-12">
-          <span className="text-xs uppercase tracking-[0.2em] text-[#8B6F47] font-semibold block mb-2">
+          <span className="text-xs uppercase tracking-[0.2em] text-[#7A6039] font-semibold block mb-2">
             Get in Touch
           </span>
           <h1 className="font-serif text-4xl sm:text-5xl text-[#4F2607] font-light mb-4">
@@ -99,7 +99,7 @@ export const ContactPage: React.FC = () => {
 
               <div className="space-y-4 text-xs font-light text-stone-700">
                 <div className="flex items-start gap-3">
-                  <MapPin className="w-5 h-5 text-[#8B6F47] shrink-0 mt-0.5" />
+                  <MapPin className="w-5 h-5 text-[#7A6039] shrink-0 mt-0.5" />
                   <div>
                     <strong className="font-medium text-[#4F2607] block text-sm">Flagship Showroom & Studio</strong>
                     <span>Plot 14, Kafue Road</span>
@@ -109,7 +109,7 @@ export const ContactPage: React.FC = () => {
                 </div>
 
                 <div className="flex items-start gap-3">
-                  <Phone className="w-5 h-5 text-[#8B6F47] shrink-0 mt-0.5" />
+                  <Phone className="w-5 h-5 text-[#7A6039] shrink-0 mt-0.5" />
                   <div>
                     <strong className="font-medium text-[#4F2607] block text-sm">Telephone & WhatsApp</strong>
                     <span>+260 97 123 4567</span>
@@ -117,7 +117,7 @@ export const ContactPage: React.FC = () => {
                 </div>
 
                 <div className="flex items-start gap-3">
-                  <Mail className="w-5 h-5 text-[#8B6F47] shrink-0 mt-0.5" />
+                  <Mail className="w-5 h-5 text-[#7A6039] shrink-0 mt-0.5" />
                   <div>
                     <strong className="font-medium text-[#4F2607] block text-sm">Direct Atelier Inquiries</strong>
                     <span>hello@mukangoafrica.co.za</span>
@@ -127,7 +127,7 @@ export const ContactPage: React.FC = () => {
                 </div>
 
                 <div className="flex items-start gap-3 pt-3 border-t border-stone-100">
-                  <Clock className="w-5 h-5 text-[#8B6F47] shrink-0 mt-0.5" />
+                  <Clock className="w-5 h-5 text-[#7A6039] shrink-0 mt-0.5" />
                   <div>
                     <strong className="font-medium text-[#4F2607] block text-sm">Showroom Hours</strong>
                     <span>Monday — Friday: 08:30 – 17:30</span>
@@ -162,6 +162,7 @@ export const ContactPage: React.FC = () => {
                 <input
                   type="text"
                   name="botField"
+                  aria-hidden="true"
                   value={formData.botField}
                   onChange={(e) => setFormData({ ...formData, botField: e.target.value })}
                   className="hidden"
@@ -175,10 +176,11 @@ export const ContactPage: React.FC = () => {
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-xs uppercase tracking-wider text-stone-700 font-medium mb-1.5">
+                    <label htmlFor="ct-name" className="block text-xs uppercase tracking-wider text-stone-700 font-medium mb-1.5">
                       Full Name *
                     </label>
                     <input
+                        id="ct-name"
                       type="text"
                       required
                       value={formData.name}
@@ -189,10 +191,11 @@ export const ContactPage: React.FC = () => {
                   </div>
 
                   <div>
-                    <label className="block text-xs uppercase tracking-wider text-stone-700 font-medium mb-1.5">
+                    <label htmlFor="ct-email" className="block text-xs uppercase tracking-wider text-stone-700 font-medium mb-1.5">
                       Email Address *
                     </label>
                     <input
+                        id="ct-email"
                       type="email"
                       required
                       value={formData.email}
@@ -205,10 +208,11 @@ export const ContactPage: React.FC = () => {
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-xs uppercase tracking-wider text-stone-700 font-medium mb-1.5">
+                    <label htmlFor="ct-phone" className="block text-xs uppercase tracking-wider text-stone-700 font-medium mb-1.5">
                       Phone Number
                     </label>
                     <input
+                        id="ct-phone"
                       type="tel"
                       value={formData.phone}
                       onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
@@ -218,10 +222,11 @@ export const ContactPage: React.FC = () => {
                   </div>
 
                   <div>
-                    <label className="block text-xs uppercase tracking-wider text-stone-700 font-medium mb-1.5">
+                    <label htmlFor="ct-enquiry" className="block text-xs uppercase tracking-wider text-stone-700 font-medium mb-1.5">
                       Enquiry Nature
                     </label>
                     <select
+                        id="ct-enquiry"
                       value={formData.enquiryType}
                       onChange={(e) => setFormData({ ...formData, enquiryType: e.target.value })}
                       className="w-full text-xs p-3 bg-white border border-[#D4B896] rounded text-[#2D2A26] focus:outline-hidden focus:border-[#4F2607]"
@@ -235,10 +240,11 @@ export const ContactPage: React.FC = () => {
                 </div>
 
                 <div>
-                  <label className="block text-xs uppercase tracking-wider text-stone-700 font-medium mb-1.5">
-                    Subject *
+                  <label htmlFor="ct-subject" className="block text-xs uppercase tracking-wider text-stone-700 font-medium mb-1.5">
+                      Subject *
                   </label>
                   <input
+                        id="ct-subject"
                     type="text"
                     required
                     value={formData.subject}
@@ -249,10 +255,11 @@ export const ContactPage: React.FC = () => {
                 </div>
 
                 <div>
-                  <label className="block text-xs uppercase tracking-wider text-stone-700 font-medium mb-1.5">
-                    Message *
+                  <label htmlFor="ct-message" className="block text-xs uppercase tracking-wider text-stone-700 font-medium mb-1.5">
+                      Message *
                   </label>
                   <textarea
+                        id="ct-message"
                     rows={5}
                     required
                     value={formData.message}
@@ -263,7 +270,7 @@ export const ContactPage: React.FC = () => {
                 </div>
 
                 {submissionResult && !submissionResult.success && (
-                  <div className="p-3 bg-red-50 text-[#C02B0A] rounded text-xs border border-red-200">
+                  <div role="alert" className="p-3 bg-red-50 text-[#C02B0A] rounded text-xs border border-red-200">
                     {submissionResult.message}
                   </div>
                 )}

@@ -1,6 +1,7 @@
 import React from "react";
 import { Button } from "../common/Button";
 import { Trees, Hammer, Shield, Sun } from "lucide-react";
+import { scrollToTop } from "../../utils/scroll";
 
 interface CraftsmanshipSectionProps {
   onNavigate?: (path: string) => void;
@@ -10,7 +11,7 @@ export const CraftsmanshipSection: React.FC<CraftsmanshipSectionProps> = ({ onNa
   const handleNav = (href: string) => {
     if (onNavigate) {
       onNavigate(href);
-      window.scrollTo({ top: 0, behavior: "smooth" });
+      scrollToTop();
     } else {
       window.location.href = href;
     }
@@ -50,7 +51,7 @@ export const CraftsmanshipSection: React.FC<CraftsmanshipSectionProps> = ({ onNa
 
           {/* Editorial Text */}
           <div className="lg:col-span-6 space-y-6">
-            <span className="text-xs uppercase tracking-[0.2em] text-[#8B6F47] font-medium block">
+            <span className="text-xs uppercase tracking-[0.2em] text-[#7A6039] font-medium block">
               About The Art
             </span>
             <h2 className="font-serif text-3xl sm:text-4xl lg:text-5xl font-light text-[#4F2607] leading-tight">
@@ -63,7 +64,7 @@ export const CraftsmanshipSection: React.FC<CraftsmanshipSectionProps> = ({ onNa
             {/* Feature Points */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 pt-4 border-t border-[#D4B896]/30">
               <div className="flex items-start gap-3">
-                <Trees className="w-5 h-5 text-[#8B6F47] shrink-0 mt-1" />
+                <Trees className="w-5 h-5 text-[#7A6039] shrink-0 mt-1" />
                 <div>
                   <h4 className="font-serif text-base text-[#4F2607]">Indigenous Timbers</h4>
                   <p className="text-xs font-light text-stone-600 mt-1">
@@ -73,7 +74,7 @@ export const CraftsmanshipSection: React.FC<CraftsmanshipSectionProps> = ({ onNa
               </div>
 
               <div className="flex items-start gap-3">
-                <Sun className="w-5 h-5 text-[#8B6F47] shrink-0 mt-1" />
+                <Sun className="w-5 h-5 text-[#7A6039] shrink-0 mt-1" />
                 <div>
                   <h4 className="font-serif text-base text-[#4F2607]">Solar Kiln Seasoned</h4>
                   <p className="text-xs font-light text-stone-600 mt-1">
@@ -83,7 +84,7 @@ export const CraftsmanshipSection: React.FC<CraftsmanshipSectionProps> = ({ onNa
               </div>
 
               <div className="flex items-start gap-3">
-                <Hammer className="w-5 h-5 text-[#8B6F47] shrink-0 mt-1" />
+                <Hammer className="w-5 h-5 text-[#7A6039] shrink-0 mt-1" />
                 <div>
                   <h4 className="font-serif text-base text-[#4F2607]">Hand Joinery</h4>
                   <p className="text-xs font-light text-stone-600 mt-1">
@@ -93,7 +94,7 @@ export const CraftsmanshipSection: React.FC<CraftsmanshipSectionProps> = ({ onNa
               </div>
 
               <div className="flex items-start gap-3">
-                <Shield className="w-5 h-5 text-[#8B6F47] shrink-0 mt-1" />
+                <Shield className="w-5 h-5 text-[#7A6039] shrink-0 mt-1" />
                 <div>
                   <h4 className="font-serif text-base text-[#4F2607]">25-Year Guarantee</h4>
                   <p className="text-xs font-light text-stone-600 mt-1">

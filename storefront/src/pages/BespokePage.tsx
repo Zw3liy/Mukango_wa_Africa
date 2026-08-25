@@ -8,28 +8,28 @@ export const BespokePage: React.FC = () => {
   const steps = [
     {
       number: "01",
-      icon: <MessageSquare className="w-6 h-6 text-[#8B6F47]" />,
+      icon: <MessageSquare className="w-6 h-6 text-[#7A6039]" />,
       title: "Vision & Architectural Consultation",
       description:
         "Share your room dimensions, aesthetic preferences, timber choices, and functional needs with our design team.",
     },
     {
       number: "02",
-      icon: <Compass className="w-6 h-6 text-[#8B6F47]" />,
+      icon: <Compass className="w-6 h-6 text-[#7A6039]" />,
       title: "Concept Sketches & Wood Selection",
       description:
         "We draft 3D technical schematics and present physical cured hardwood grain samples from our Barotse concession stores.",
     },
     {
       number: "03",
-      icon: <Hammer className="w-6 h-6 text-[#8B6F47]" />,
+      icon: <Hammer className="w-6 h-6 text-[#7A6039]" />,
       title: "Hand Carving & Studio Updates",
       description:
         "Our master carvers shape every curve using traditional gouges and mortise-tenon joinery, sharing weekly progress photography.",
     },
     {
       number: "04",
-      icon: <Eye className="w-6 h-6 text-[#8B6F47]" />,
+      icon: <Eye className="w-6 h-6 text-[#7A6039]" />,
       title: "ISPM-15 Crating & White-Glove Delivery",
       description:
         "Each commission is crated in certified protective timber crates and freighted worldwide with full transit insurance.",
@@ -49,7 +49,7 @@ export const BespokePage: React.FC = () => {
 
         {/* Hero Section */}
         <div className="py-12 text-center max-w-3xl mx-auto mb-16">
-          <span className="text-xs uppercase tracking-[0.2em] text-[#8B6F47] font-semibold block mb-2">
+          <span className="text-xs uppercase tracking-[0.2em] text-[#7A6039] font-semibold block mb-2">
             Private Commissions
           </span>
           <h1 className="font-serif text-4xl sm:text-5xl lg:text-6xl text-[#4F2607] font-light mb-6">
@@ -63,7 +63,7 @@ export const BespokePage: React.FC = () => {
         {/* Process Steps */}
         <div className="mb-20">
           <div className="text-center max-w-xl mx-auto mb-12">
-            <span className="text-xs uppercase tracking-widest text-[#8B6F47] font-medium block mb-1">
+            <span className="text-xs uppercase tracking-widest text-[#7A6039] font-medium block mb-1">
               Atelier Protocol
             </span>
             <h2 className="font-serif text-2xl sm:text-3xl text-[#4F2607] font-light">
@@ -85,7 +85,7 @@ export const BespokePage: React.FC = () => {
                   <h3 className="font-serif text-lg text-[#4F2607] font-normal mb-2">{step.title}</h3>
                   <p className="text-xs font-light text-stone-600 leading-relaxed">{step.description}</p>
                 </div>
-                <div className="mt-4 pt-4 border-t border-stone-100 flex items-center gap-1 text-[11px] text-[#8B6F47] font-medium">
+                <div className="mt-4 pt-4 border-t border-stone-100 flex items-center gap-1 text-[11px] text-[#7A6039] font-medium">
                   <CheckCircle2 className="w-3.5 h-3.5" />
                   <span>Curator Approved</span>
                 </div>

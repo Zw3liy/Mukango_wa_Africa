@@ -78,7 +78,7 @@ export const BespokeForm: React.FC = () => {
         <div className="w-16 h-16 rounded-full bg-emerald-50 text-emerald-700 flex items-center justify-center mx-auto mb-4 border border-emerald-200">
           <CheckCircle2 className="w-8 h-8" />
         </div>
-        <span className="text-xs uppercase tracking-widest text-[#8B6F47] font-semibold block mb-1">
+        <span className="text-xs uppercase tracking-widest text-[#7A6039] font-semibold block mb-1">
           Commission Registered
         </span>
         <h3 className="font-serif text-3xl text-[#4F2607] mb-3">
@@ -96,11 +96,11 @@ export const BespokeForm: React.FC = () => {
 
         <div className="pt-6 border-t border-stone-100 flex flex-col sm:flex-row items-center justify-center gap-4 text-xs text-stone-500 font-light">
           <div className="flex items-center gap-1.5">
-            <Compass className="w-4 h-4 text-[#8B6F47]" />
+            <Compass className="w-4 h-4 text-[#7A6039]" />
             <span>Concept sketches in 3–5 business days</span>
           </div>
           <div className="flex items-center gap-1.5">
-            <ShieldCheck className="w-4 h-4 text-[#8B6F47]" />
+            <ShieldCheck className="w-4 h-4 text-[#7A6039]" />
             <span>25-Year Structural Guarantee Included</span>
           </div>
         </div>
@@ -123,7 +123,7 @@ export const BespokeForm: React.FC = () => {
 
       {/* Header */}
       <div>
-        <span className="text-xs uppercase tracking-[0.2em] text-[#8B6F47] font-semibold block mb-1">
+        <span className="text-xs uppercase tracking-[0.2em] text-[#7A6039] font-semibold block mb-1">
           Bespoke Consultation
         </span>
         <h3 className="font-serif text-2xl sm:text-3xl text-[#4F2607] font-normal">
@@ -136,10 +136,10 @@ export const BespokeForm: React.FC = () => {
 
       {/* Piece Type Selection */}
       <div>
-        <label className="block text-xs uppercase tracking-wider text-stone-700 font-medium mb-3">
+        <p id="bf-piece-type-label" className="block text-xs uppercase tracking-wider text-stone-700 font-medium mb-3">
           1. What type of piece are you commissioning? *
-        </label>
-        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+        </p>
+        <div role="group" aria-labelledby="bf-piece-type-label" className="grid grid-cols-2 sm:grid-cols-3 gap-3">
           {[
             { id: "dining_table", label: "Dining Table (8–14 Seats)" },
             { id: "statement_chair", label: "Throned Armchair" },
@@ -151,6 +151,7 @@ export const BespokeForm: React.FC = () => {
             <button
               type="button"
               key={type.id}
+              aria-pressed={formData.pieceType === type.id}
               onClick={() => setFormData({ ...formData, pieceType: type.id })}
               className={`p-3 rounded text-xs text-left transition border ${
                 formData.pieceType === type.id
@@ -167,10 +168,11 @@ export const BespokeForm: React.FC = () => {
       {/* Timber & Motif Selection */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
         <div>
-          <label className="block text-xs uppercase tracking-wider text-stone-700 font-medium mb-2">
+          <label htmlFor="bf-timber" className="block text-xs uppercase tracking-wider text-stone-700 font-medium mb-2">
             2. Preferred Indigenous Timber
           </label>
           <select
+              id="bf-timber"
             value={formData.preferredTimber}
             onChange={(e) => setFormData({ ...formData, preferredTimber: e.target.value })}
             className="w-full text-xs p-3 bg-white border border-[#D4B896] rounded text-[#2D2A26] focus:outline-hidden focus:border-[#4F2607]"
@@ -184,10 +186,11 @@ export const BespokeForm: React.FC = () => {
         </div>
 
         <div>
-          <label className="block text-xs uppercase tracking-wider text-stone-700 font-medium mb-2">
+          <label htmlFor="bf-motif" className="block text-xs uppercase tracking-wider text-stone-700 font-medium mb-2">
             3. Design Motif Lineage
           </label>
           <select
+              id="bf-motif"
             value={formData.motifPreference}
             onChange={(e) => setFormData({ ...formData, motifPreference: e.target.value })}
             className="w-full text-xs p-3 bg-white border border-[#D4B896] rounded text-[#2D2A26] focus:outline-hidden focus:border-[#4F2607]"
@@ -204,10 +207,11 @@ export const BespokeForm: React.FC = () => {
       {/* Dimensions & Setting */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
         <div>
-          <label className="block text-xs uppercase tracking-wider text-stone-700 font-medium mb-2">
+          <label htmlFor="bf-dimensions" className="block text-xs uppercase tracking-wider text-stone-700 font-medium mb-2">
             4. Estimated Dimensions (e.g. 280 × 110 × 76 cm)
           </label>
           <input
+              id="bf-dimensions"
             type="text"
             value={formData.dimensionsEstimate}
             onChange={(e) => setFormData({ ...formData, dimensionsEstimate: e.target.value })}
@@ -217,10 +221,11 @@ export const BespokeForm: React.FC = () => {
         </div>
 
         <div>
-          <label className="block text-xs uppercase tracking-wider text-stone-700 font-medium mb-2">
+          <label htmlFor="bf-setting" className="block text-xs uppercase tracking-wider text-stone-700 font-medium mb-2">
             5. Intended Setting / Property
           </label>
           <select
+              id="bf-setting"
             value={formData.intendedSpace}
             onChange={(e) => setFormData({ ...formData, intendedSpace: e.target.value })}
             className="w-full text-xs p-3 bg-white border border-[#D4B896] rounded text-[#2D2A26] focus:outline-hidden focus:border-[#4F2607]"
@@ -236,10 +241,11 @@ export const BespokeForm: React.FC = () => {
 
       {/* Project Description */}
       <div>
-        <label className="block text-xs uppercase tracking-wider text-stone-700 font-medium mb-2">
-          6. Project Vision & Custom Requirements *
+        <label htmlFor="bf-vision" className="block text-xs uppercase tracking-wider text-stone-700 font-medium mb-2">
+            6. Project Vision & Custom Requirements *
         </label>
         <textarea
+              id="bf-vision"
           rows={4}
           required
           value={formData.projectDescription}
@@ -252,10 +258,11 @@ export const BespokeForm: React.FC = () => {
       {/* Budget & Target Delivery */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
         <div>
-          <label className="block text-xs uppercase tracking-wider text-stone-700 font-medium mb-2">
+          <label htmlFor="bf-budget" className="block text-xs uppercase tracking-wider text-stone-700 font-medium mb-2">
             7. Target Investment Range (ZAR / USD)
           </label>
           <select
+              id="bf-budget"
             value={formData.budgetRangeUsd}
             onChange={(e) =>
               setFormData({
@@ -273,10 +280,11 @@ export const BespokeForm: React.FC = () => {
         </div>
 
         <div>
-          <label className="block text-xs uppercase tracking-wider text-stone-700 font-medium mb-2">
+          <label htmlFor="bf-country" className="block text-xs uppercase tracking-wider text-stone-700 font-medium mb-2">
             8. Destination Country *
           </label>
           <input
+              id="bf-country"
             type="text"
             required
             value={formData.country}
@@ -289,16 +297,17 @@ export const BespokeForm: React.FC = () => {
 
       {/* Patron Contact Details */}
       <div className="pt-6 border-t border-[#D4B896]/30">
-        <h4 className="text-xs uppercase tracking-wider text-[#8B6F47] font-semibold mb-4">
+        <h4 className="text-xs uppercase tracking-wider text-[#7A6039] font-semibold mb-4">
           Patron Contact Information
         </h4>
 
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <div>
-            <label className="block text-[11px] uppercase tracking-wider text-stone-500 mb-1">
+            <label htmlFor="bf-name" className="block text-[11px] uppercase tracking-wider text-stone-500 mb-1">
               Full Name *
             </label>
             <input
+              id="bf-name"
               type="text"
               required
               value={formData.fullName}
@@ -309,10 +318,11 @@ export const BespokeForm: React.FC = () => {
           </div>
 
           <div>
-            <label className="block text-[11px] uppercase tracking-wider text-stone-500 mb-1">
+            <label htmlFor="bf-email" className="block text-[11px] uppercase tracking-wider text-stone-500 mb-1">
               Email Address *
             </label>
             <input
+              id="bf-email"
               type="email"
               required
               value={formData.email}
@@ -323,10 +333,11 @@ export const BespokeForm: React.FC = () => {
           </div>
 
           <div>
-            <label className="block text-[11px] uppercase tracking-wider text-stone-500 mb-1">
+            <label htmlFor="bf-phone" className="block text-[11px] uppercase tracking-wider text-stone-500 mb-1">
               Phone / WhatsApp
             </label>
             <input
+              id="bf-phone"
               type="tel"
               value={formData.phone}
               onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
@@ -338,7 +349,7 @@ export const BespokeForm: React.FC = () => {
       </div>
 
       {submissionResult && !submissionResult.success && (
-        <div className="p-3 bg-red-50 text-[#C02B0A] rounded text-xs border border-red-200">
+        <div role="alert" className="p-3 bg-red-50 text-[#C02B0A] rounded text-xs border border-red-200">
           {submissionResult.message}
         </div>
       )}

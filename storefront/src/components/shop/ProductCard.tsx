@@ -4,6 +4,7 @@ import { formatPrice } from "../../utils/currency";
 import { Badge } from "../common/Badge";
 import { useCart } from "../../context/CartContext";
 import { ShoppingBag, Eye } from "lucide-react";
+import { scrollToTop } from "../../utils/scroll";
 
 interface ProductCardProps {
   product: Product;
@@ -18,7 +19,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onNavigate })
     const target = `/products/${product.slug}`;
     if (onNavigate) {
       onNavigate(target);
-      window.scrollTo({ top: 0, behavior: "smooth" });
+      scrollToTop();
     } else {
       window.location.href = target;
     }
@@ -67,13 +68,13 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onNavigate })
 
       {/* Info Container */}
       <div className="p-5 flex flex-col flex-1">
-        <div className="flex items-center justify-between gap-2 text-xs font-light text-[#8B6F47] uppercase tracking-wider mb-1.5">
+        <div className="flex items-center justify-between gap-2 text-xs font-light text-[#7A6039] uppercase tracking-wider mb-1.5">
           <span>{product.category}</span>
           <span>{product.timber.split(" ")[0]}</span>
         </div>
 
         <h3
-          className="font-serif text-lg font-normal text-[#4F2607] group-hover:text-[#8B6F47] transition mb-1 cursor-pointer"
+          className="font-serif text-lg font-normal text-[#4F2607] group-hover:text-[#7A6039] transition mb-1 cursor-pointer"
           onClick={handleCardClick}
         >
           {product.name}
@@ -95,7 +96,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onNavigate })
 
           <button
             onClick={handleQuickAdd}
-            className="text-xs uppercase tracking-wider font-medium text-[#4F2607] hover:text-[#8B6F47] border-b border-[#4F2607] hover:border-[#8B6F47] pb-0.5 transition"
+            className="text-xs uppercase tracking-wider font-medium text-[#4F2607] hover:text-[#7A6039] border-b border-[#4F2607] hover:border-[#8B6F47] pb-0.5 transition"
           >
             Inquire / Add
           </button>

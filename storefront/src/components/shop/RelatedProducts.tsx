@@ -19,7 +19,7 @@ export const RelatedProducts: React.FC<RelatedProductsProps> = ({ currentProduct
   return (
     <section className="mt-20 pt-16 border-t border-[#D4B896]/30">
       <div className="text-center max-w-xl mx-auto mb-10">
-        <span className="text-xs uppercase tracking-[0.2em] text-[#8B6F47] font-medium block mb-2">
+        <span className="text-xs uppercase tracking-[0.2em] text-[#7A6039] font-medium block mb-2">
           Curated Harmonies
         </span>
         <h3 className="font-serif text-2xl sm:text-3xl text-[#4F2607] font-light">

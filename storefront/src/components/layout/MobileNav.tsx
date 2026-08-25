@@ -99,15 +99,15 @@ export const MobileNav: React.FC<MobileNavProps> = ({
             Lusaka Atelier & Showroom
           </p>
           <div className="flex items-start gap-2">
-            <MapPin className="w-4 h-4 text-[#8B6F47] shrink-0 mt-0.5" />
+            <MapPin className="w-4 h-4 text-[#7A6039] shrink-0 mt-0.5" />
             <span>Plot 14, Kafue Road, Lusaka, Zambia</span>
           </div>
           <div className="flex items-center gap-2">
-            <Phone className="w-4 h-4 text-[#8B6F47] shrink-0" />
+            <Phone className="w-4 h-4 text-[#7A6039] shrink-0" />
             <span>+260 97 123 4567</span>
           </div>
           <div className="flex items-center gap-2">
-            <Mail className="w-4 h-4 text-[#8B6F47] shrink-0" />
+            <Mail className="w-4 h-4 text-[#7A6039] shrink-0" />
             <span>hello@mukangoafrica.co.za</span>
           </div>
         </div>

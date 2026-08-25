@@ -1,6 +1,7 @@
 import React from "react";
 import { JOURNAL_ARTICLES } from "../../data/journal";
 import { ArrowRight, Clock } from "lucide-react";
+import { scrollToTop } from "../../utils/scroll";
 
 interface JournalPreviewProps {
   onNavigate?: (path: string) => void;
@@ -11,7 +12,7 @@ export const JournalPreview: React.FC<JournalPreviewProps> = ({ onNavigate }) =>
     const target = `/journal/${slug}`;
     if (onNavigate) {
       onNavigate(target);
-      window.scrollTo({ top: 0, behavior: "smooth" });
+      scrollToTop();
     } else {
       window.location.href = target;
     }
@@ -20,7 +21,7 @@ export const JournalPreview: React.FC<JournalPreviewProps> = ({ onNavigate }) =>
   const handleViewAll = () => {
     if (onNavigate) {
       onNavigate("/journal");
-      window.scrollTo({ top: 0, behavior: "smooth" });
+      scrollToTop();
     } else {
       window.location.href = "/journal";
     }
@@ -31,7 +32,7 @@ export const JournalPreview: React.FC<JournalPreviewProps> = ({ onNavigate }) =>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
           <div>
-            <span className="text-xs uppercase tracking-[0.2em] text-[#8B6F47] font-medium block mb-2">
+            <span className="text-xs uppercase tracking-[0.2em] text-[#7A6039] font-medium block mb-2">
               Atelier Chronicle
             </span>
             <h2 className="font-serif text-3xl sm:text-4xl text-[#4F2607] font-light">
@@ -41,7 +42,7 @@ export const JournalPreview: React.FC<JournalPreviewProps> = ({ onNavigate }) =>
 
           <button
             onClick={handleViewAll}
-            className="inline-flex items-center gap-2 text-xs uppercase tracking-wider font-medium text-[#4F2607] hover:text-[#8B6F47] transition"
+            className="inline-flex items-center gap-2 text-xs uppercase tracking-wider font-medium text-[#4F2607] hover:text-[#7A6039] transition"
           >
             <span>View All Issues</span>
             <ArrowRight className="w-4 h-4" />
@@ -75,7 +76,7 @@ export const JournalPreview: React.FC<JournalPreviewProps> = ({ onNavigate }) =>
                     </span>
                   </div>
 
-                  <h3 className="font-serif text-xl font-normal text-[#4F2607] group-hover:text-[#8B6F47] transition mb-2">
+                  <h3 className="font-serif text-xl font-normal text-[#4F2607] group-hover:text-[#7A6039] transition mb-2">
                     {article.title}
                   </h3>
 
@@ -84,7 +85,7 @@ export const JournalPreview: React.FC<JournalPreviewProps> = ({ onNavigate }) =>
                   </p>
                 </div>
 
-                <div className="pt-4 mt-4 border-t border-stone-100 flex items-center justify-between text-xs text-[#8B6F47] font-medium">
+                <div className="pt-4 mt-4 border-t border-stone-100 flex items-center justify-between text-xs text-[#7A6039] font-medium">
                   <span>Read Full Article</span>
                   <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
                 </div>
