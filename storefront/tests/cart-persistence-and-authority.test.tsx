@@ -125,9 +125,10 @@ describe("Cart Persistence & Server Price Authority", () => {
     delete process.env.DATABASE_URL;
 
     try {
-      // Fresh module graph for this environment so the singleton is constructed
-      // without the in-memory test fallback.
-      const { ProductionOrderStore } = await import("../src/server/orderStore?case=production-boundary");
+      // This file statically imports nothing from orderStore, so the dynamic
+      // import evaluates the module here — under the production environment
+      // set above — constructing the singleton without the in-memory test fallback.
+      const { ProductionOrderStore } = await import("../src/server/orderStore");
 
       expect(ProductionOrderStore.isDatabaseConfigured().configured).toBe(false);
 
