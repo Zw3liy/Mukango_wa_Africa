@@ -23,6 +23,11 @@ export class TestMemoryOrderStore implements OrderStore {
     if (!order.id || !order.reference) {
       return { success: false, error: "Order is missing mandatory ID or reference." };
     }
+    // Guard against a distinct order reusing an existing primary key
+    const existing = this.orders.get(order.id);
+    if (existing && existing.reference !== order.reference) {
+      return { success: false, error: "ORDER_ID_COLLISION" };
+    }
     this.orders.set(order.reference, order);
     this.orders.set(order.id, order);
     return { success: true };
@@ -238,15 +243,10 @@ export class ProductionOrderStore implements OrderStore {
       const totalAmount = order.pricing.total;
       const currency = order.pricing.currency || "ZAR";
 
-      await pool.query(
+      const insertResult = await pool.query(
         `INSERT INTO mukango_orders (id, reference, status, customer_email, total_amount, currency, data, created_at, updated_at)
          VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
-         ON CONFLICT (id) DO UPDATE SET
-           status = EXCLUDED.status,
-           total_amount = EXCLUDED.total_amount,
-           currency = EXCLUDED.currency,
-           data = EXCLUDED.data,
-           updated_at = EXCLUDED.updated_at`,
+         ON CONFLICT (id) DO NOTHING`,
         [
           order.id,
           order.reference,
@@ -259,6 +259,18 @@ export class ProductionOrderStore implements OrderStore {
           order.updatedAt,
         ]
       );
+
+      if (insertResult.rowCount === 0) {
+        // An order with this primary key already exists. A re-save of the SAME
+        // order (same reference) is benign; a different order signals a
+        // collision that must be retried with fresh identity.
+        const existing = await pool.query(`SELECT reference FROM mukango_orders WHERE id = $1 LIMIT 1`, [order.id]);
+        const existingReference = existing.rows[0]?.reference;
+        if (existingReference === order.reference) {
+          return { success: true };
+        }
+        return { success: false, error: "ORDER_ID_COLLISION" };
+      }
 
       return { success: true };
     } catch (err) {

@@ -3,6 +3,7 @@ import { JOURNAL_ARTICLES } from "../data/journal";
 import { SEO } from "../components/common/SEO";
 import { Breadcrumbs } from "../components/common/Breadcrumbs";
 import { ArrowRight, Clock, User } from "lucide-react";
+import { scrollToTop } from "../utils/scroll";
 
 interface JournalPageProps {
   onNavigate?: (path: string) => void;
@@ -13,7 +14,7 @@ export const JournalPage: React.FC<JournalPageProps> = ({ onNavigate }) => {
     const target = `/journal/${slug}`;
     if (onNavigate) {
       onNavigate(target);
-      window.scrollTo({ top: 0, behavior: "smooth" });
+      scrollToTop();
     } else {
       window.location.href = target;
     }
@@ -32,7 +33,7 @@ export const JournalPage: React.FC<JournalPageProps> = ({ onNavigate }) => {
 
         {/* Header */}
         <div className="py-12 text-center max-w-2xl mx-auto mb-12">
-          <span className="text-xs uppercase tracking-[0.2em] text-[#8B6F47] font-semibold block mb-2">
+          <span className="text-xs uppercase tracking-[0.2em] text-[#7A6039] font-semibold block mb-2">
             Atelier Chronicles
           </span>
           <h1 className="font-serif text-4xl sm:text-5xl text-[#4F2607] font-light mb-4">
@@ -63,14 +64,14 @@ export const JournalPage: React.FC<JournalPageProps> = ({ onNavigate }) => {
               <div className="p-6 flex-1 flex flex-col justify-between">
                 <div>
                   <div className="flex items-center justify-between text-xs text-stone-400 mb-2 font-light">
-                    <span className="text-[#8B6F47] font-medium">{article.issueNumber}</span>
+                    <span className="text-[#7A6039] font-medium">{article.issueNumber}</span>
                     <span className="flex items-center gap-1">
                       <Clock className="w-3 h-3" />
                       {article.readTimeMinutes} min read
                     </span>
                   </div>
 
-                  <h2 className="font-serif text-2xl font-normal text-[#4F2607] group-hover:text-[#8B6F47] transition mb-2">
+                  <h2 className="font-serif text-2xl font-normal text-[#4F2607] group-hover:text-[#7A6039] transition mb-2">
                     {article.title}
                   </h2>
 
@@ -81,10 +82,10 @@ export const JournalPage: React.FC<JournalPageProps> = ({ onNavigate }) => {
 
                 <div className="pt-4 border-t border-stone-100 flex items-center justify-between text-xs text-stone-500">
                   <span className="flex items-center gap-1.5 font-light">
-                    <User className="w-3.5 h-3.5 text-[#8B6F47]" />
+                    <User className="w-3.5 h-3.5 text-[#7A6039]" />
                     {article.author.name}
                   </span>
-                  <ArrowRight className="w-4 h-4 text-[#8B6F47] group-hover:translate-x-1 transition-transform" />
+                  <ArrowRight className="w-4 h-4 text-[#7A6039] group-hover:translate-x-1 transition-transform" />
                 </div>
               </div>
             </article>

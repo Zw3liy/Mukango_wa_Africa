@@ -93,7 +93,7 @@ export const OrderConfirmationPage: React.FC<OrderConfirmationPageProps> = ({
             <CheckCircle2 className="w-8 h-8" />
           </div>
 
-          <span className="text-xs uppercase tracking-[0.2em] text-[#8B6F47] font-semibold block mb-1">
+          <span className="text-xs uppercase tracking-[0.2em] text-[#7A6039] font-semibold block mb-1">
             Order Reference Established
           </span>
 
@@ -139,7 +139,7 @@ export const OrderConfirmationPage: React.FC<OrderConfirmationPageProps> = ({
           {/* Wire Instructions / Pro-Forma Notice Box */}
           <div className="text-left bg-[#FAF9F6] p-6 sm:p-8 rounded border border-[#D4B896]/40 mb-8 space-y-4">
             <div className="flex items-center gap-2 pb-3 border-b border-[#D4B896]/30">
-              <Building2 className="w-5 h-5 text-[#8B6F47]" />
+              <Building2 className="w-5 h-5 text-[#7A6039]" />
               <h3 className="font-serif text-lg text-[#4F2607] font-normal">
                 Payment & Pro-Forma Invoicing
               </h3>
@@ -148,7 +148,7 @@ export const OrderConfirmationPage: React.FC<OrderConfirmationPageProps> = ({
             {order?.payment.method === "wire_transfer" || order?.payment.method === "bespoke_invoice" ? (
               <div className="space-y-4">
                 <div className="flex items-start gap-3 p-4 bg-white rounded border border-stone-200 text-xs text-stone-700 leading-relaxed">
-                  <FileText className="w-5 h-5 text-[#8B6F47] shrink-0 mt-0.5" />
+                  <FileText className="w-5 h-5 text-[#7A6039] shrink-0 mt-0.5" />
                   <div>
                     <strong className="font-medium text-[#4F2607] block mb-1">Official Pro-Forma Invoice</strong>
                     <p>
@@ -158,7 +158,7 @@ export const OrderConfirmationPage: React.FC<OrderConfirmationPageProps> = ({
                 </div>
 
                 <div className="flex items-start gap-3 p-4 bg-white rounded border border-stone-200 text-xs text-stone-700 leading-relaxed">
-                  <Mail className="w-5 h-5 text-[#8B6F47] shrink-0 mt-0.5" />
+                  <Mail className="w-5 h-5 text-[#7A6039] shrink-0 mt-0.5" />
                   <div>
                     <strong className="font-medium text-[#4F2607] block mb-1">Atelier Coordination</strong>
                     <p>

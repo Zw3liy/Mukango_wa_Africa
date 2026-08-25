@@ -119,9 +119,11 @@ export async function handleApiRequest(req: ApiServerRequest): Promise<ApiServer
 
       return jsonResponse(statusCode, sessionResponse, originHeader);
     } catch (err) {
+      // Log the details server-side; return a safe generic message to the client.
+      console.error("Checkout session processing failed:", err);
       return jsonResponse(500, {
         status: "config_error",
-        errorMessage: err instanceof Error ? err.message : "Internal error processing checkout session.",
+        errorMessage: "Internal error processing checkout session. Please try again or contact the atelier.",
       }, originHeader);
     }
   }

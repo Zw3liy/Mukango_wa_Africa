@@ -23,7 +23,7 @@ export const FaqPage: React.FC = () => {
         <Breadcrumbs items={[{ label: "Frequently Asked Questions", href: "/faq" }]} />
 
         <div className="py-12 text-center max-w-2xl mx-auto mb-8">
-          <span className="text-xs uppercase tracking-[0.2em] text-[#8B6F47] font-semibold block mb-2">
+          <span className="text-xs uppercase tracking-[0.2em] text-[#7A6039] font-semibold block mb-2">
             Patron Inquiries
           </span>
           <h1 className="font-serif text-4xl sm:text-5xl text-[#4F2607] font-light mb-4">
@@ -45,11 +45,11 @@ export const FaqPage: React.FC = () => {
               >
                 <button
                   onClick={() => toggleFaq(faq.id)}
-                  className="w-full p-6 text-left flex items-center justify-between gap-4 font-serif text-lg text-[#4F2607] hover:text-[#8B6F47] transition"
+                  className="w-full p-6 text-left flex items-center justify-between gap-4 font-serif text-lg text-[#4F2607] hover:text-[#7A6039] transition"
                   aria-expanded={isOpen}
                 >
                   <span className="flex items-center gap-3">
-                    <HelpCircle className="w-5 h-5 text-[#8B6F47] shrink-0" />
+                    <HelpCircle className="w-5 h-5 text-[#7A6039] shrink-0" />
                     <span>{faq.question}</span>
                   </span>
                   {isOpen ? (

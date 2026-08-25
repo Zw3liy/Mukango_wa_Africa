@@ -53,7 +53,7 @@ export const CartPage: React.FC<CartPageProps> = ({ onNavigate }) => {
 
         <div className="py-8 border-b border-[#D4B896]/30 mb-8 flex flex-col sm:flex-row sm:items-end justify-between gap-4">
           <div>
-            <span className="text-xs uppercase tracking-[0.2em] text-[#8B6F47] font-semibold block mb-1">
+            <span className="text-xs uppercase tracking-[0.2em] text-[#7A6039] font-semibold block mb-1">
               Review Selection
             </span>
             <h1 className="font-serif text-3xl sm:text-4xl text-[#4F2607] font-light">
@@ -73,7 +73,7 @@ export const CartPage: React.FC<CartPageProps> = ({ onNavigate }) => {
 
         {items.length === 0 ? (
           <div className="py-20 text-center max-w-md mx-auto bg-white p-10 rounded border border-[#D4B896]/30 shadow-subtle my-8">
-            <div className="w-16 h-16 rounded-full bg-[#EFE6DA] flex items-center justify-center text-[#8B6F47] mx-auto mb-4">
+            <div className="w-16 h-16 rounded-full bg-[#EFE6DA] flex items-center justify-center text-[#7A6039] mx-auto mb-4">
               <ShoppingBag className="w-8 h-8 stroke-[1.5]" />
             </div>
             <h2 className="font-serif text-2xl text-[#4F2607] mb-2">Your basket is empty</h2>
@@ -164,7 +164,7 @@ export const CartPage: React.FC<CartPageProps> = ({ onNavigate }) => {
                 </Button>
 
                 <div className="flex items-center justify-center gap-2 text-[11px] text-stone-500 font-light text-center">
-                  <ShieldCheck className="w-4 h-4 text-[#8B6F47]" />
+                  <ShieldCheck className="w-4 h-4 text-[#7A6039]" />
                   <span>25-Year Heirloom Warranty & Phytosanitary Export</span>
                 </div>
               </div>

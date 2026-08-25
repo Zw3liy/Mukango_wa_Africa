@@ -1,6 +1,7 @@
 import React from "react";
 import { DESIGN_MOTIFS } from "../../data/motifs";
 import { ArrowRight } from "lucide-react";
+import { scrollToTop } from "../../utils/scroll";
 
 interface MotifsSectionProps {
   onNavigate?: (path: string) => void;
@@ -11,7 +12,7 @@ export const MotifsSection: React.FC<MotifsSectionProps> = ({ onNavigate }) => {
     const target = `/shop?motif=${motifId}`;
     if (onNavigate) {
       onNavigate(target);
-      window.scrollTo({ top: 0, behavior: "smooth" });
+      scrollToTop();
     } else {
       window.location.href = target;
     }
@@ -21,7 +22,7 @@ export const MotifsSection: React.FC<MotifsSectionProps> = ({ onNavigate }) => {
     <section className="py-20 bg-[#F7F5F0] border-y border-[#D4B896]/30">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center max-w-2xl mx-auto mb-16">
-          <span className="text-xs uppercase tracking-[0.2em] text-[#8B6F47] font-medium block mb-2">
+          <span className="text-xs uppercase tracking-[0.2em] text-[#7A6039] font-medium block mb-2">
             Artistic Lineage
           </span>
           <h2 className="font-serif text-3xl sm:text-4xl text-[#4F2607] font-light mb-4">

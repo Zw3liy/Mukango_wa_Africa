@@ -152,7 +152,7 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ onNavigate }) => {
         />
 
         <div className="py-8 border-b border-[#D4B896]/30 mb-8">
-          <span className="text-xs uppercase tracking-[0.2em] text-[#8B6F47] font-semibold block mb-1">
+          <span className="text-xs uppercase tracking-[0.2em] text-[#7A6039] font-semibold block mb-1">
             Authoritative Checkout
           </span>
           <h1 className="font-serif text-3xl sm:text-4xl text-[#4F2607] font-light">
@@ -350,7 +350,7 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ onNavigate }) => {
                   />
                   <div className="flex-1">
                     <div className="flex items-center gap-2">
-                      <Building2 className="w-4 h-4 text-[#8B6F47]" />
+                      <Building2 className="w-4 h-4 text-[#7A6039]" />
                       <span className="font-medium text-xs text-[#2D2A26] uppercase tracking-wider">
                         Direct Bank Wire / SWIFT Pro-Forma Invoice (Preferred)
                       </span>
@@ -379,7 +379,7 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ onNavigate }) => {
                   />
                   <div className="flex-1">
                     <div className="flex items-center gap-2">
-                      <CreditCard className="w-4 h-4 text-[#8B6F47]" />
+                      <CreditCard className="w-4 h-4 text-[#7A6039]" />
                       <span className="font-medium text-xs text-[#2D2A26] uppercase tracking-wider">
                         Credit / Debit Card (Stripe Gateway)
                       </span>
@@ -408,7 +408,7 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ onNavigate }) => {
                   />
                   <div className="flex-1">
                     <div className="flex items-center gap-2">
-                      <Lock className="w-4 h-4 text-[#8B6F47]" />
+                      <Lock className="w-4 h-4 text-[#7A6039]" />
                       <span className="font-medium text-xs text-[#2D2A26] uppercase tracking-wider">
                         PayFast (South Africa / SADC Instant EFT)
                       </span>
@@ -423,7 +423,7 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ onNavigate }) => {
 
             {/* Error Message Box */}
             {errorMessage && (
-              <div className="p-4 bg-red-50 rounded border border-red-200 text-[#C02B0A] text-xs flex items-start gap-3 animate-fade-in">
+              <div role="alert" className="p-4 bg-red-50 rounded border border-red-200 text-[#C02B0A] text-xs flex items-start gap-3 animate-fade-in">
                 <AlertCircle className="w-5 h-5 shrink-0 mt-0.5" />
                 <div className="flex-1">
                   <strong className="block font-semibold mb-0.5">Integration Report:</strong>
@@ -498,7 +498,7 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ onNavigate }) => {
               </Button>
 
               <div className="flex items-center justify-center gap-2 text-[11px] text-stone-500 font-light text-center">
-                <ShieldCheck className="w-4 h-4 text-[#8B6F47]" />
+                <ShieldCheck className="w-4 h-4 text-[#7A6039]" />
                 <span>Strict Security Boundary • 25-Year Heirloom Warranty</span>
               </div>
             </div>

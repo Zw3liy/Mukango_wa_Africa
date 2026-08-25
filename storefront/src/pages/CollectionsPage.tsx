@@ -3,6 +3,7 @@ import { COLLECTIONS } from "../data/collections";
 import { SEO } from "../components/common/SEO";
 import { Breadcrumbs } from "../components/common/Breadcrumbs";
 import { ArrowRight } from "lucide-react";
+import { scrollToTop } from "../utils/scroll";
 
 interface CollectionsPageProps {
   onNavigate?: (path: string) => void;
@@ -13,7 +14,7 @@ export const CollectionsPage: React.FC<CollectionsPageProps> = ({ onNavigate }) 
     const target = `/collections/${slug}`;
     if (onNavigate) {
       onNavigate(target);
-      window.scrollTo({ top: 0, behavior: "smooth" });
+      scrollToTop();
     } else {
       window.location.href = target;
     }
@@ -31,7 +32,7 @@ export const CollectionsPage: React.FC<CollectionsPageProps> = ({ onNavigate }) 
         <Breadcrumbs items={[{ label: "Collections", href: "/collections" }]} />
 
         <div className="py-8 text-center max-w-2xl mx-auto mb-12">
-          <span className="text-xs uppercase tracking-[0.2em] text-[#8B6F47] font-semibold block mb-2">
+          <span className="text-xs uppercase tracking-[0.2em] text-[#7A6039] font-semibold block mb-2">
             Narrative Curations
           </span>
           <h1 className="font-serif text-3xl sm:text-5xl text-[#4F2607] font-light mb-4">
@@ -63,10 +64,10 @@ export const CollectionsPage: React.FC<CollectionsPageProps> = ({ onNavigate }) 
 
               <div className="p-8 flex-1 flex flex-col justify-between space-y-4">
                 <div>
-                  <span className="text-xs uppercase tracking-widest text-[#8B6F47] font-medium block mb-1">
+                  <span className="text-xs uppercase tracking-widest text-[#7A6039] font-medium block mb-1">
                     {col.tagline}
                   </span>
-                  <h2 className="font-serif text-2xl sm:text-3xl text-[#4F2607] group-hover:text-[#8B6F47] transition mb-3">
+                  <h2 className="font-serif text-2xl sm:text-3xl text-[#4F2607] group-hover:text-[#7A6039] transition mb-3">
                     {col.title}
                   </h2>
                   <p className="text-xs font-light text-stone-600 leading-relaxed mb-4">
@@ -77,7 +78,7 @@ export const CollectionsPage: React.FC<CollectionsPageProps> = ({ onNavigate }) 
                   </blockquote>
                 </div>
 
-                <div className="pt-4 border-t border-stone-100 flex items-center justify-between text-xs uppercase tracking-wider font-medium text-[#4F2607] group-hover:text-[#8B6F47]">
+                <div className="pt-4 border-t border-stone-100 flex items-center justify-between text-xs uppercase tracking-wider font-medium text-[#4F2607] group-hover:text-[#7A6039]">
                   <span>Explore Collection Suites</span>
                   <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                 </div>

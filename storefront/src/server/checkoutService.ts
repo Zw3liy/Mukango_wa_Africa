@@ -102,9 +102,17 @@ export async function processCheckoutSession(
   }
 
   // 4. Generate Order Identity
-  const orderNumber = Math.floor(1000 + Math.random() * 9000);
-  const orderId = `MWA-${new Date().getFullYear()}-${orderNumber}`;
-  const reference = crypto.randomBytes(16).toString("hex");
+  // Human-readable order id with a cryptographic uniqueness suffix so that
+  // concurrent commissions can never collide on the primary key.
+  const generateOrderIdentity = () => {
+    const orderNumber = Math.floor(1000 + Math.random() * 9000);
+    const uniqueness = crypto.randomBytes(2).toString("hex").toUpperCase();
+    return {
+      orderId: `MWA-${new Date().getFullYear()}-${orderNumber}-${uniqueness}`,
+      reference: crypto.randomBytes(16).toString("hex"),
+    };
+  };
+  let { orderId, reference } = generateOrderIdentity();
 
   const orderRecord: OrderRecord = {
     id: orderId,
@@ -142,8 +150,16 @@ export async function processCheckoutSession(
     ],
   };
 
-  // 5. Save Order to Durable Store
-  const saveResult = await orderStore.saveOrder(orderRecord);
+  // 5. Save Order to Durable Store (with identity-collision retry)
+  let saveResult = await orderStore.saveOrder(orderRecord);
+  let collisionRetries = 0;
+  while (!saveResult.success && saveResult.error === "ORDER_ID_COLLISION" && collisionRetries < 3) {
+    collisionRetries += 1;
+    ({ orderId, reference } = generateOrderIdentity());
+    orderRecord.id = orderId;
+    orderRecord.reference = reference;
+    saveResult = await orderStore.saveOrder(orderRecord);
+  }
   if (!saveResult.success) {
     return {
       orderId: "",

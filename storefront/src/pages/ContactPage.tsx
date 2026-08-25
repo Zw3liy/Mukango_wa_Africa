@@ -78,7 +78,7 @@ export const ContactPage: React.FC = () => {
 
         {/* Page Title */}
         <div className="py-10 text-center max-w-2xl mx-auto mb-12">
-          <span className="text-xs uppercase tracking-[0.2em] text-[#8B6F47] font-semibold block mb-2">
+          <span className="text-xs uppercase tracking-[0.2em] text-[#7A6039] font-semibold block mb-2">
             Get in Touch
           </span>
           <h1 className="font-serif text-4xl sm:text-5xl text-[#4F2607] font-light mb-4">
@@ -99,7 +99,7 @@ export const ContactPage: React.FC = () => {
 
               <div className="space-y-4 text-xs font-light text-stone-700">
                 <div className="flex items-start gap-3">
-                  <MapPin className="w-5 h-5 text-[#8B6F47] shrink-0 mt-0.5" />
+                  <MapPin className="w-5 h-5 text-[#7A6039] shrink-0 mt-0.5" />
                   <div>
                     <strong className="font-medium text-[#4F2607] block text-sm">Flagship Showroom & Studio</strong>
                     <span>Plot 14, Kafue Road</span>
@@ -109,7 +109,7 @@ export const ContactPage: React.FC = () => {
                 </div>
 
                 <div className="flex items-start gap-3">
-                  <Phone className="w-5 h-5 text-[#8B6F47] shrink-0 mt-0.5" />
+                  <Phone className="w-5 h-5 text-[#7A6039] shrink-0 mt-0.5" />
                   <div>
                     <strong className="font-medium text-[#4F2607] block text-sm">Telephone & WhatsApp</strong>
                     <span>+260 97 123 4567</span>
@@ -117,7 +117,7 @@ export const ContactPage: React.FC = () => {
                 </div>
 
                 <div className="flex items-start gap-3">
-                  <Mail className="w-5 h-5 text-[#8B6F47] shrink-0 mt-0.5" />
+                  <Mail className="w-5 h-5 text-[#7A6039] shrink-0 mt-0.5" />
                   <div>
                     <strong className="font-medium text-[#4F2607] block text-sm">Direct Atelier Inquiries</strong>
                     <span>hello@mukangoafrica.co.za</span>
@@ -127,7 +127,7 @@ export const ContactPage: React.FC = () => {
                 </div>
 
                 <div className="flex items-start gap-3 pt-3 border-t border-stone-100">
-                  <Clock className="w-5 h-5 text-[#8B6F47] shrink-0 mt-0.5" />
+                  <Clock className="w-5 h-5 text-[#7A6039] shrink-0 mt-0.5" />
                   <div>
                     <strong className="font-medium text-[#4F2607] block text-sm">Showroom Hours</strong>
                     <span>Monday — Friday: 08:30 – 17:30</span>
@@ -270,7 +270,7 @@ export const ContactPage: React.FC = () => {
                 </div>
 
                 {submissionResult && !submissionResult.success && (
-                  <div className="p-3 bg-red-50 text-[#C02B0A] rounded text-xs border border-red-200">
+                  <div role="alert" className="p-3 bg-red-50 text-[#C02B0A] rounded text-xs border border-red-200">
                     {submissionResult.message}
                   </div>
                 )}

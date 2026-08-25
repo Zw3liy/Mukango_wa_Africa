@@ -16,7 +16,7 @@ export const ShippingPage: React.FC = () => {
         <Breadcrumbs items={[{ label: "Shipping & Global Freight", href: "/shipping" }]} />
 
         <div className="py-12 text-center max-w-2xl mx-auto mb-10">
-          <span className="text-xs uppercase tracking-[0.2em] text-[#8B6F47] font-semibold block mb-2">
+          <span className="text-xs uppercase tracking-[0.2em] text-[#7A6039] font-semibold block mb-2">
             Logistics & Freight
           </span>
           <h1 className="font-serif text-4xl sm:text-5xl text-[#4F2607] font-light mb-4">
@@ -30,7 +30,7 @@ export const ShippingPage: React.FC = () => {
         <div className="space-y-8 bg-white p-8 md:p-10 rounded border border-[#D4B896]/30 shadow-subtle mb-16 text-sm font-light text-stone-700 leading-relaxed">
           <div>
             <h2 className="font-serif text-2xl text-[#4F2607] mb-3 flex items-center gap-2">
-              <Box className="w-5 h-5 text-[#8B6F47]" />
+              <Box className="w-5 h-5 text-[#7A6039]" />
               <span>ISPM-15 Certified Phytosanitary Wooden Crates</span>
             </h2>
             <p>
@@ -40,7 +40,7 @@ export const ShippingPage: React.FC = () => {
 
           <div className="pt-6 border-t border-stone-100">
             <h2 className="font-serif text-2xl text-[#4F2607] mb-3 flex items-center gap-2">
-              <ShieldCheck className="w-5 h-5 text-[#8B6F47]" />
+              <ShieldCheck className="w-5 h-5 text-[#7A6039]" />
               <span>100% Comprehensive Transit Cargo Insurance</span>
             </h2>
             <p>
@@ -50,7 +50,7 @@ export const ShippingPage: React.FC = () => {
 
           <div className="pt-6 border-t border-stone-100">
             <h2 className="font-serif text-2xl text-[#4F2607] mb-3 flex items-center gap-2">
-              <Plane className="w-5 h-5 text-[#8B6F47]" />
+              <Plane className="w-5 h-5 text-[#7A6039]" />
               <span>Estimated Delivery Lead Times</span>
             </h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-3">

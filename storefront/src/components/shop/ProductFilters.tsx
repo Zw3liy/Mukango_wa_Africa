@@ -62,7 +62,7 @@ export const ProductFilters: React.FC<ProductFiltersProps> = ({
       {/* Category Pills Header */}
       <div>
         <div className="flex items-center justify-between mb-3">
-          <span className="text-xs uppercase tracking-widest text-[#8B6F47] font-semibold flex items-center gap-2">
+          <span className="text-xs uppercase tracking-widest text-[#7A6039] font-semibold flex items-center gap-2">
             <SlidersHorizontal className="w-4 h-4" />
             <span>Category</span>
           </span>
@@ -165,7 +165,7 @@ export const ProductFilters: React.FC<ProductFiltersProps> = ({
           {hasActiveFilters && (
             <button
               onClick={onReset}
-              className="text-xs text-[#8B6F47] hover:text-[#4F2607] flex items-center gap-1 font-medium transition"
+              className="text-xs text-[#7A6039] hover:text-[#4F2607] flex items-center gap-1 font-medium transition"
             >
               <X className="w-3.5 h-3.5" />
               <span>Clear all filters</span>

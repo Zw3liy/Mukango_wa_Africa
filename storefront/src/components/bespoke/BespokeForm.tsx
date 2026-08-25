@@ -78,7 +78,7 @@ export const BespokeForm: React.FC = () => {
         <div className="w-16 h-16 rounded-full bg-emerald-50 text-emerald-700 flex items-center justify-center mx-auto mb-4 border border-emerald-200">
           <CheckCircle2 className="w-8 h-8" />
         </div>
-        <span className="text-xs uppercase tracking-widest text-[#8B6F47] font-semibold block mb-1">
+        <span className="text-xs uppercase tracking-widest text-[#7A6039] font-semibold block mb-1">
           Commission Registered
         </span>
         <h3 className="font-serif text-3xl text-[#4F2607] mb-3">
@@ -96,11 +96,11 @@ export const BespokeForm: React.FC = () => {
 
         <div className="pt-6 border-t border-stone-100 flex flex-col sm:flex-row items-center justify-center gap-4 text-xs text-stone-500 font-light">
           <div className="flex items-center gap-1.5">
-            <Compass className="w-4 h-4 text-[#8B6F47]" />
+            <Compass className="w-4 h-4 text-[#7A6039]" />
             <span>Concept sketches in 3–5 business days</span>
           </div>
           <div className="flex items-center gap-1.5">
-            <ShieldCheck className="w-4 h-4 text-[#8B6F47]" />
+            <ShieldCheck className="w-4 h-4 text-[#7A6039]" />
             <span>25-Year Structural Guarantee Included</span>
           </div>
         </div>
@@ -123,7 +123,7 @@ export const BespokeForm: React.FC = () => {
 
       {/* Header */}
       <div>
-        <span className="text-xs uppercase tracking-[0.2em] text-[#8B6F47] font-semibold block mb-1">
+        <span className="text-xs uppercase tracking-[0.2em] text-[#7A6039] font-semibold block mb-1">
           Bespoke Consultation
         </span>
         <h3 className="font-serif text-2xl sm:text-3xl text-[#4F2607] font-normal">
@@ -297,7 +297,7 @@ export const BespokeForm: React.FC = () => {
 
       {/* Patron Contact Details */}
       <div className="pt-6 border-t border-[#D4B896]/30">
-        <h4 className="text-xs uppercase tracking-wider text-[#8B6F47] font-semibold mb-4">
+        <h4 className="text-xs uppercase tracking-wider text-[#7A6039] font-semibold mb-4">
           Patron Contact Information
         </h4>
 
@@ -349,7 +349,7 @@ export const BespokeForm: React.FC = () => {
       </div>
 
       {submissionResult && !submissionResult.success && (
-        <div className="p-3 bg-red-50 text-[#C02B0A] rounded text-xs border border-red-200">
+        <div role="alert" className="p-3 bg-red-50 text-[#C02B0A] rounded text-xs border border-red-200">
           {submissionResult.message}
         </div>
       )}

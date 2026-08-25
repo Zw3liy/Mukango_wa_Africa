@@ -65,13 +65,13 @@ export const ProductSpecs: React.FC<ProductSpecsProps> = ({ product }) => {
             </div>
 
             <div className="pt-4 border-t border-stone-100">
-              <h4 className="text-xs uppercase tracking-wider text-[#8B6F47] font-semibold mb-3">
+              <h4 className="text-xs uppercase tracking-wider text-[#7A6039] font-semibold mb-3">
                 Key Architectural Highlights
               </h4>
               <ul className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs font-light text-stone-700">
                 {product.highlights.map((h, i) => (
                   <li key={i} className="flex items-start gap-2">
-                    <Sparkles className="w-3.5 h-3.5 text-[#8B6F47] shrink-0 mt-0.5" />
+                    <Sparkles className="w-3.5 h-3.5 text-[#7A6039] shrink-0 mt-0.5" />
                     <span>{h}</span>
                   </li>
                 ))}
@@ -111,7 +111,7 @@ export const ProductSpecs: React.FC<ProductSpecsProps> = ({ product }) => {
         {activeTab === "care" && (
           <div className="space-y-6">
             <div className="flex items-start gap-4 p-4 bg-[#FAF9F6] rounded border border-[#8B6F47]/30">
-              <ShieldCheck className="w-6 h-6 text-[#8B6F47] shrink-0 mt-1" />
+              <ShieldCheck className="w-6 h-6 text-[#7A6039] shrink-0 mt-1" />
               <div>
                 <h4 className="font-serif text-base text-[#4F2607] mb-1">25-Year Heirloom Warranty</h4>
                 <p className="text-xs font-light text-stone-600 leading-relaxed">
@@ -121,7 +121,7 @@ export const ProductSpecs: React.FC<ProductSpecsProps> = ({ product }) => {
             </div>
 
             <div>
-              <h4 className="text-xs uppercase tracking-wider text-[#8B6F47] font-semibold mb-3">
+              <h4 className="text-xs uppercase tracking-wider text-[#7A6039] font-semibold mb-3">
                 Timber Maintenance Protocol
               </h4>
               <ul className="space-y-2 text-xs font-light text-stone-700">

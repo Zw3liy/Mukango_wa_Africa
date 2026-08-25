@@ -112,7 +112,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({ onNavigate }) => {
         <div className="flex-1 overflow-y-auto p-5">
           {items.length === 0 ? (
             <div className="h-full flex flex-col items-center justify-center text-center p-6">
-              <div className="w-16 h-16 rounded-full bg-[#EFE6DA] flex items-center justify-center text-[#8B6F47] mb-4">
+              <div className="w-16 h-16 rounded-full bg-[#EFE6DA] flex items-center justify-center text-[#7A6039] mb-4">
                 <ShoppingBag className="w-8 h-8 stroke-[1.5]" />
               </div>
               <h3 className="font-serif text-xl text-[#4F2607] mb-2">Your basket is empty</h3>
@@ -206,7 +206,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({ onNavigate }) => {
             </Button>
 
             <div className="flex items-center justify-center gap-2 text-[11px] text-stone-500 font-light">
-              <ShieldCheck className="w-3.5 h-3.5 text-[#8B6F47]" />
+              <ShieldCheck className="w-3.5 h-3.5 text-[#7A6039]" />
               <span>ISPM-15 Certified Phytosanitary Crated Freight</span>
             </div>
           </div>
