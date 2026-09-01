@@ -3,9 +3,10 @@ import { SEO } from "../components/common/SEO";
 import { Breadcrumbs } from "../components/common/Breadcrumbs";
 import { PRODUCTS } from "../data/products";
 import { ProductGrid } from "../components/shop/ProductGrid";
-import { ProductFilters, FilterState } from "../components/shop/ProductFilters";
+import { ProductFilters, FilterState, CATALOGUE_MAX_PRICE_ZAR } from "../components/shop/ProductFilters";
 import { ProductSort, SortOption } from "../components/shop/ProductSort";
 import { ProductCategory, DesignMotif } from "../types/product";
+import { convertFromUsd } from "../utils/currency";
 
 interface ShopPageProps {
   initialSearch?: string;
@@ -24,7 +25,7 @@ export const ShopPage: React.FC<ShopPageProps> = ({
     category: initialCategory,
     motif: initialMotif,
     timber: "all",
-    maxPrice: 8000,
+    maxPrice: CATALOGUE_MAX_PRICE_ZAR,
     inStockOnly: false,
     searchQuery: initialSearch,
   });
@@ -47,7 +48,7 @@ export const ShopPage: React.FC<ShopPageProps> = ({
       category: "all",
       motif: "all",
       timber: "all",
-      maxPrice: 8000,
+      maxPrice: CATALOGUE_MAX_PRICE_ZAR,
       inStockOnly: false,
       searchQuery: "",
     });
@@ -69,7 +70,7 @@ export const ShopPage: React.FC<ShopPageProps> = ({
         return false;
       }
       // Max price filter
-      if (product.basePriceUsd > filters.maxPrice) {
+      if (convertFromUsd(product.basePriceUsd, "ZAR") > filters.maxPrice) {
         return false;
       }
       // In-stock filter
