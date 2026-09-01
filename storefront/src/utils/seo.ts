@@ -3,12 +3,11 @@ import { Currency } from "../types/commerce";
 import { FX_RATES, DEFAULT_CURRENCY } from "./currency";
 
 export function getBaseSiteUrl(): string {
-  // In browser, window.location.origin can be used; on server / build time, check process.env.SITE_URL
-  if (typeof window !== "undefined" && window.location?.origin) {
-    return window.location.origin;
-  }
   if (typeof process !== "undefined" && process.env?.SITE_URL) {
     return process.env.SITE_URL.replace(/\/+$/, "");
+  }
+  if (typeof window !== "undefined" && window.location?.origin) {
+    return window.location.origin;
   }
   return "https://mukangoafrica.co.za";
 }
@@ -27,7 +26,7 @@ export function generateProductJsonLd(
   const rate = FX_RATES[currency] ?? 1.0;
   const price = (product.basePriceUsd * rate).toFixed(2);
 
-  const schema = {
+  const schema: Record<string, unknown> = {
     "@context": "https://schema.org/",
     "@type": "Product",
     name: product.name,
@@ -60,6 +59,16 @@ export function generateProductJsonLd(
     },
   };
 
+  if (product.aggregateRating?.verified && product.aggregateRating.reviewCount > 0) {
+    schema.aggregateRating = {
+      "@type": "AggregateRating",
+      ratingValue: product.aggregateRating.ratingValue,
+      reviewCount: product.aggregateRating.reviewCount,
+      bestRating: product.aggregateRating.bestRating ?? 5,
+      worstRating: product.aggregateRating.worstRating ?? 1,
+    };
+  }
+
   return JSON.stringify(schema);
 }
 
@@ -86,11 +95,15 @@ export function generateOrganizationJsonLd(siteUrl?: string): string {
   const base = siteUrl || getBaseSiteUrl();
   const schema = {
     "@context": "https://schema.org",
-    "@type": "FurnitureStore",
+    "@type": ["Organization", "LocalBusiness", "FurnitureStore"],
+    "@id": `${base}/#organization`,
     name: "Mukango Wa Africa",
     description: "Heirloom handcrafted furniture bridging Zambian artisanal mastery with contemporary architecture.",
     url: base,
     logo: `${base}/favicon.svg`,
+    image: `${base}/images/hero.jpg`,
+    email: "hello@mukangoafrica.co.za",
+    telephone: "+260971234567",
     address: {
       "@type": "PostalAddress",
       streetAddress: "Plot 14, Kafue Road",
@@ -106,4 +119,31 @@ export function generateOrganizationJsonLd(siteUrl?: string): string {
   };
 
   return JSON.stringify(schema);
+}
+
+export function generateArticleJsonLd(article: {
+  slug: string;
+  title: string;
+  excerpt: string;
+  image: string;
+  publishedDate: string;
+  author: { name: string };
+}, siteUrl?: string): string {
+  const base = siteUrl || getBaseSiteUrl();
+  const image = article.image.startsWith("http") ? article.image : `${base}${article.image}`;
+  const published = new Date(article.publishedDate);
+  const datePublished = Number.isNaN(published.getTime())
+    ? article.publishedDate
+    : `${published.getFullYear()}-${String(published.getMonth() + 1).padStart(2, "0")}-${String(published.getDate()).padStart(2, "0")}`;
+  return JSON.stringify({
+    "@context": "https://schema.org",
+    "@type": "Article",
+    headline: article.title,
+    description: article.excerpt,
+    image: [image],
+    datePublished,
+    author: { "@type": "Person", name: article.author.name },
+    publisher: { "@id": `${base}/#organization` },
+    mainEntityOfPage: `${base}/journal/${article.slug}`,
+  });
 }

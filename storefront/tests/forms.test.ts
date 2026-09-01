@@ -59,12 +59,13 @@ describe("Forms & Delivery Provider Boundary", () => {
     expect(res.submissionId).toMatch(/^MWA-BESPOKE-/);
   });
 
-  it("validates newsletter submissions", async () => {
+  it("validates newsletter submissions and fails closed without a provider", async () => {
     const badRes = await handleNewsletterSubmission({ email: "notanemail" });
     expect(badRes.success).toBe(false);
 
-    const goodRes = await handleNewsletterSubmission({ email: "collector@example.com" });
-    expect(goodRes.success).toBe(true);
-    expect(goodRes.message).toContain("Collectors Circle");
+    delete process.env.NEWSLETTER_SUBSCRIBE_URL;
+    const unconfiguredRes = await handleNewsletterSubmission({ email: "collector@example.com" });
+    expect(unconfiguredRes.success).toBe(false);
+    expect(unconfiguredRes.isConfigurationFailure).toBe(true);
   });
 });

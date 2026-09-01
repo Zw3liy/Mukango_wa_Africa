@@ -18,6 +18,60 @@ export interface JournalArticle {
 
 export const JOURNAL_ARTICLES: JournalArticle[] = [
   {
+    id: "journal-sustainable-hardwood-harvesting",
+    slug: "sustainable-zambian-hardwood-harvesting",
+    issueNumber: "Material Guide N°03",
+    title: "Sustainable Zambian Hardwood Harvesting",
+    subtitle: "A field guide to selective forestry, timber traceability, and responsible luxury African furniture.",
+    excerpt: "How selective harvesting, chain-of-custody records, and patient seasoning protect Zambia's hardwood forests while supporting heirloom furniture making.",
+    content: [
+      "Luxury African furniture begins long before a board reaches the bench. Responsible sourcing means selecting mature trees under licensed forestry controls, recording concession and transport documentation, and rejecting timber whose origin cannot be traced.",
+      "Selective harvesting preserves younger canopy and seed trees instead of clearing whole stands. At the workshop, each accepted board is logged by species, source region, arrival date, moisture content, and the artisan commission in which it is eventually used.",
+      "Long air drying followed by controlled kiln conditioning reduces waste because stable boards are less likely to split during carving or fail after export. The result is a slower but more accountable path from Zambian woodland to a generational interior."
+    ],
+    author: { name: "Chiwama Kennedy Daka", role: "Founder & Master Craftsman" },
+    publishedDate: "August 28, 2026",
+    readTimeMinutes: 8,
+    image: "/images/craftsmanship.jpg",
+    tags: ["Sustainable Forestry", "Zambian Hardwood", "Traceability", "African Furniture"],
+  },
+  {
+    id: "journal-ispm-15-export-guide",
+    slug: "ispm-15-african-furniture-export-guide",
+    issueNumber: "Export Guide N°02",
+    title: "ISPM-15 and Exporting African Furniture",
+    subtitle: "What international collectors and design studios should know about compliant timber packaging.",
+    excerpt: "A practical overview of ISPM-15 export-crate compliance, phytosanitary preparation, and protected delivery for handcrafted African furniture.",
+    content: [
+      "ISPM-15 applies to solid-wood packaging materials used in international trade. For an exported dining table or sculptural chair, the shipping crate and timber bracing must be appropriately treated and marked by an authorized provider where the destination requires it.",
+      "The furniture itself follows separate destination-specific customs and plant-health requirements. Before dispatch, the atelier records timber species, commercial invoice details, packing specifications, treatment evidence, and the collector's destination so the freight partner can confirm the applicable route.",
+      "A compliant crate is also a conservation tool: moisture barriers, edge protection, immobilized components, and insured freight reduce the risk of movement or climate exposure during a long international journey."
+    ],
+    author: { name: "Mutale Mwila", role: "Lead Architectural Designer" },
+    publishedDate: "August 20, 2026",
+    readTimeMinutes: 7,
+    image: "/images/hero.jpg",
+    tags: ["ISPM-15", "Furniture Export", "Phytosanitary", "Global Delivery"],
+  },
+  {
+    id: "journal-artisan-provenance",
+    slug: "artisan-provenance-logs-heirloom-furniture",
+    issueNumber: "Provenance Log N°01",
+    title: "The Artisan Provenance Log",
+    subtitle: "Following an heirloom piece from timber ledger to the craftsperson's final signature.",
+    excerpt: "Why named makers, material ledgers, workshop milestones, and signed certificates matter when commissioning collectible African furniture.",
+    content: [
+      "Provenance turns a beautiful object into an accountable cultural record. A Mukango log links the finished piece to its timber species, workshop batch, principal makers, joinery milestones, finish schedule, and completion date.",
+      "These records do not replace independent forestry or export documents. They preserve the human chain of custody: who selected the grain, who cut the joints, who carved the narrative relief, and who approved the final surface under workshop light.",
+      "For collectors, architects, and hospitality projects, a signed provenance certificate supports future care, restoration, insurance, and intergenerational transfer without reducing the artisan's contribution to anonymous manufacture."
+    ],
+    author: { name: "Chiwama Kennedy Daka", role: "Founder & Master Craftsman" },
+    publishedDate: "August 12, 2026",
+    readTimeMinutes: 6,
+    image: "/images/craftsmanship.jpg",
+    tags: ["Artisan Provenance", "Heirloom Furniture", "Collectible Design", "Lusaka Atelier"],
+  },
+  {
     id: "journal-mukwa-wood",
     slug: "quiet-language-of-mukwa-wood",
     issueNumber: "Issue N°14",

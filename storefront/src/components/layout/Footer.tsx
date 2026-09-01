@@ -36,7 +36,10 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email }),
       });
-      const data = await res.json();
+      const data = await res.json().catch(() => ({ success: false, message: "The registry service returned an invalid response." }));
+      if (!res.ok) {
+        throw new Error(data.message || "The registry service is currently unavailable.");
+      }
       if (data.success) {
         setSubscribed(true);
         setEmail("");
@@ -44,10 +47,8 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
       } else {
         showToast(data.message || "Failed to register.", "error");
       }
-    } catch {
-      setSubscribed(true);
-      setEmail("");
-      showToast("Welcome to the Mukango Collectors Circle.", "success");
+    } catch (error) {
+      showToast(error instanceof Error ? error.message : "The registry service is currently unavailable. Please try again.", "error");
     } finally {
       setIsSubmitting(false);
     }

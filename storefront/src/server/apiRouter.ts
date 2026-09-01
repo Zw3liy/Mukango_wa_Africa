@@ -8,6 +8,7 @@ import { handleContactFormSubmission, handleBespokeFormSubmission, handleNewslet
 import { validateOrigin, enforcePayloadSizeLimit } from "./security";
 import { globalRateLimiter } from "./rateLimiter";
 import { PaymentMethod } from "../types/commerce";
+import { getVerifiedAggregateRating } from "./reviewProvider";
 
 function jsonResponse(status: number, data: unknown, originHeader?: string): ApiServerResponse {
   const isAllowed = validateOrigin(originHeader);
@@ -213,6 +214,19 @@ export async function handleApiRequest(req: ApiServerRequest): Promise<ApiServer
       return jsonResponse(result.success ? 200 : 400, result, originHeader);
     } catch {
       return jsonResponse(400, { success: false, message: "Invalid newsletter submission payload." }, originHeader);
+    }
+  }
+
+  // --- GET /api/reviews/aggregate?product=:slug ---
+  if (pathname === "/api/reviews/aggregate" && req.method === "GET") {
+    const slug = searchParams.get("product") || "";
+    if (!slug) return jsonResponse(400, { success: false, error: "Missing product slug." }, originHeader);
+    try {
+      const rating = await getVerifiedAggregateRating(slug);
+      return jsonResponse(200, { success: true, available: Boolean(rating), rating }, originHeader);
+    } catch (error) {
+      console.error("Verified review provider failed:", error);
+      return jsonResponse(502, { success: false, error: "Verified review data is temporarily unavailable." }, originHeader);
     }
   }
 

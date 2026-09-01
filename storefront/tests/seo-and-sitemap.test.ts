@@ -51,6 +51,24 @@ describe("SEO & Sitemap Validation", () => {
     const parsedUsd = JSON.parse(usdJsonLd);
     expect(parsedUsd.offers.priceCurrency).toBe("USD");
     expect(parsedUsd.offers.price).toBe(product.basePriceUsd.toFixed(2));
+
+    const ratedProduct = {
+      ...product,
+      aggregateRating: {
+        ratingValue: 4.9,
+        reviewCount: 27,
+        source: "verified-test-provider",
+        verified: true as const,
+      },
+    };
+    const ratedSchema = JSON.parse(generateProductJsonLd(ratedProduct, "https://mukangoafrica.co.za"));
+    expect(ratedSchema.aggregateRating).toEqual({
+      "@type": "AggregateRating",
+      ratingValue: 4.9,
+      reviewCount: 27,
+      bestRating: 5,
+      worstRating: 1,
+    });
   });
 
   it("generates valid Breadcrumbs & Organization JSON-LD schemas", () => {
@@ -65,7 +83,9 @@ describe("SEO & Sitemap Validation", () => {
 
     const org = generateOrganizationJsonLd();
     const parsedOrg = JSON.parse(org);
-    expect(parsedOrg["@type"]).toBe("FurnitureStore");
+    expect(parsedOrg["@type"]).toEqual(["Organization", "LocalBusiness", "FurnitureStore"]);
     expect(parsedOrg.address.addressLocality).toBe("Lusaka");
+    expect(parsedOrg.address.streetAddress).toBe("Plot 14, Kafue Road");
+    expect(parsedOrg.email).toBe("hello@mukangoafrica.co.za");
   });
 });
