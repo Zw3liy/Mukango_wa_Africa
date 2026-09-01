@@ -18,6 +18,7 @@ describe("Routing & Page Render Suite", () => {
 
     expect(screen.getByRole("heading", { name: /Curated Furniture Works/i })).toBeInTheDocument();
     expect(screen.getAllByText(/The Savannah Throned Chair/i).length).toBeGreaterThan(0);
+    expect(screen.getByText("R 148,000")).toBeInTheDocument();
   });
 
   it("renders product detail page for valid slug", () => {
