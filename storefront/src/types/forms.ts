@@ -19,7 +19,7 @@ export interface BespokeCommissionFormData {
   dimensionsEstimate?: string;
   intendedSpace?: "private_residence" | "luxury_safari_lodge" | "hotel_resort" | "corporate_office" | "embassy";
   motifPreference?: string;
-  budgetRangeUsd: "under_3000" | "3000_7500" | "7500_15000" | "15000_plus";
+  budgetRangeZar: "under_50000" | "50000_135000" | "135000_275000" | "275000_plus";
   targetDeliveryDate?: string;
   projectDescription: string;
   hasSketchesOrFloorPlan?: boolean;

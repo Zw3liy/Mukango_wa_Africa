@@ -154,7 +154,7 @@ export async function handleBespokeFormSubmission(
     <p><strong>Delivery Destination:</strong> ${country}</p>
     <p><strong>Piece Type:</strong> ${pieceType}</p>
     <p><strong>Preferred Timber:</strong> ${preferredTimber || "Artisan Recommendation"}</p>
-    <p><strong>Budget Range:</strong> ${rawInput.budgetRangeUsd || "Flexible"}</p>
+    <p><strong>Budget Range (ZAR):</strong> ${rawInput.budgetRangeZar || "Flexible"}</p>
     <p><strong>Space / Setting:</strong> ${rawInput.intendedSpace || "Residential"}</p>
     <p><strong>Project Vision & Requirements:</strong></p>
     <blockquote>${description}</blockquote>
@@ -201,6 +201,33 @@ export async function handleNewsletterSubmission(
   const email = (rawInput.email || "").trim();
   if (!isValidEmail(email)) {
     return { success: false, message: "Please provide a valid email address." };
+  }
+
+  const endpoint = process.env.NEWSLETTER_SUBSCRIBE_URL?.trim();
+  if (!endpoint) {
+    return {
+      success: false,
+      isConfigurationFailure: true,
+      message: "The Private Atelier Registry is not configured in this deployment. Please contact hello@mukangoafrica.co.za.",
+    };
+  }
+
+  try {
+    const response = await fetch(endpoint, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        ...(process.env.NEWSLETTER_API_KEY ? { Authorization: `Bearer ${process.env.NEWSLETTER_API_KEY}` } : {}),
+      },
+      body: JSON.stringify({ email, interests: rawInput.interests || [], source: "private-atelier-registry" }),
+      signal: AbortSignal.timeout(7000),
+    });
+    if (!response.ok) {
+      return { success: false, message: "The Private Atelier Registry could not accept the subscription. Please try again." };
+    }
+  } catch (error) {
+    console.error("Newsletter provider failed:", error);
+    return { success: false, message: "The Private Atelier Registry is temporarily unavailable. Please try again." };
   }
 
   return {

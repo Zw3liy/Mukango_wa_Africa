@@ -1,6 +1,11 @@
 import React from "react";
 import { ProductCategory, DesignMotif } from "../../types/product";
 import { SlidersHorizontal, X } from "lucide-react";
+import { convertFromUsd, formatCurrency } from "../../utils/currency";
+
+export const CATALOGUE_MIN_PRICE_ZAR = convertFromUsd(400, "ZAR");
+export const CATALOGUE_MAX_PRICE_ZAR = convertFromUsd(8000, "ZAR");
+const CATALOGUE_PRICE_STEP_ZAR = convertFromUsd(200, "ZAR");
 
 export interface FilterState {
   category: ProductCategory | "all";
@@ -55,7 +60,7 @@ export const ProductFilters: React.FC<ProductFiltersProps> = ({
     filters.timber !== "all" ||
     filters.inStockOnly ||
     filters.searchQuery !== "" ||
-    filters.maxPrice < 10000;
+    filters.maxPrice < CATALOGUE_MAX_PRICE_ZAR;
 
   return (
     <div className="bg-[#F7F5F0] p-6 rounded border border-[#D4B896]/30 mb-8 space-y-6">
@@ -136,14 +141,14 @@ export const ProductFilters: React.FC<ProductFiltersProps> = ({
               Max Price
             </label>
             <span className="text-xs font-semibold text-[#4F2607]">
-              ${filters.maxPrice.toLocaleString()}
+              {formatCurrency(filters.maxPrice, "ZAR")}
             </span>
           </div>
           <input
             type="range"
-            min={400}
-            max={8000}
-            step={200}
+            min={CATALOGUE_MIN_PRICE_ZAR}
+            max={CATALOGUE_MAX_PRICE_ZAR}
+            step={CATALOGUE_PRICE_STEP_ZAR}
             value={filters.maxPrice}
             onChange={(e) => onChange({ maxPrice: Number(e.target.value) })}
             className="w-full accent-[#4F2607]"
