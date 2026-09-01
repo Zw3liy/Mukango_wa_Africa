@@ -9,10 +9,10 @@ interface ProductGalleryProps {
 
 export const ProductGallery: React.FC<ProductGalleryProps> = ({ product }) => {
   const images = [
-    { src: product.images.hero, label: "Hero View" },
-    { src: product.images.detail, label: "Carving Detail" },
-    ...(product.images.inSitu ? [{ src: product.images.inSitu, label: "In Situ Room" }] : []),
-    ...(product.images.workshop ? [{ src: product.images.workshop, label: "Workshop Masterpiece" }] : []),
+    { src: product.images.hero, label: "Hero View", alt: product.images.alt },
+    { src: product.images.detail, label: "Carving Detail", alt: `${product.name} hand-carved ${product.timber} detail` },
+    ...(product.images.inSitu ? [{ src: product.images.inSitu, label: "In Situ Room", alt: `${product.name} handcrafted African furniture in an interior setting` }] : []),
+    ...(product.images.workshop ? [{ src: product.images.workshop, label: "Workshop Masterpiece", alt: `${product.name} artisan provenance in the Lusaka workshop` }] : []),
   ];
 
   const [activeIndex, setActiveIndex] = useState(0);
@@ -26,7 +26,7 @@ export const ProductGallery: React.FC<ProductGalleryProps> = ({ product }) => {
       <div className="relative aspect-4/3 sm:aspect-square bg-stone-100 rounded overflow-hidden border border-[#D4B896]/40 shadow-xs group">
         <img
           src={activeImage.src}
-          alt={`${product.name} - ${activeImage.label}`}
+          alt={activeImage.alt}
           className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
         />
 
@@ -61,7 +61,7 @@ export const ProductGallery: React.FC<ProductGalleryProps> = ({ product }) => {
                 }`}
                 aria-label={`Switch to ${img.label}`}
               >
-                <img src={img.src} alt={img.label} className="w-full h-full object-cover" />
+                <img src={img.src} alt={img.alt} className="w-full h-full object-cover" />
               </button>
             );
           })}
@@ -73,7 +73,7 @@ export const ProductGallery: React.FC<ProductGalleryProps> = ({ product }) => {
         <div className="aspect-square sm:aspect-16/10 w-full overflow-hidden bg-stone-900 rounded">
           <img
             src={activeImage.src}
-            alt={product.name}
+            alt={activeImage.alt}
             className="w-full h-full object-contain"
           />
         </div>

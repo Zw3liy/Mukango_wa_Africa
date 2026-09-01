@@ -49,6 +49,15 @@ export interface Product {
     label: string;
     value: string;
   }[];
+  /** Populated only from a verified buyer-feedback provider. Never synthesize ratings. */
+  aggregateRating?: {
+    ratingValue: number;
+    reviewCount: number;
+    bestRating?: number;
+    worstRating?: number;
+    source: string;
+    verified: true;
+  };
 }
 
 export interface Collection {

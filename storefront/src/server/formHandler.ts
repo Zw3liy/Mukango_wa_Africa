@@ -203,6 +203,33 @@ export async function handleNewsletterSubmission(
     return { success: false, message: "Please provide a valid email address." };
   }
 
+  const endpoint = process.env.NEWSLETTER_SUBSCRIBE_URL?.trim();
+  if (!endpoint) {
+    return {
+      success: false,
+      isConfigurationFailure: true,
+      message: "The Private Atelier Registry is not configured in this deployment. Please contact hello@mukangoafrica.co.za.",
+    };
+  }
+
+  try {
+    const response = await fetch(endpoint, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        ...(process.env.NEWSLETTER_API_KEY ? { Authorization: `Bearer ${process.env.NEWSLETTER_API_KEY}` } : {}),
+      },
+      body: JSON.stringify({ email, interests: rawInput.interests || [], source: "private-atelier-registry" }),
+      signal: AbortSignal.timeout(7000),
+    });
+    if (!response.ok) {
+      return { success: false, message: "The Private Atelier Registry could not accept the subscription. Please try again." };
+    }
+  } catch (error) {
+    console.error("Newsletter provider failed:", error);
+    return { success: false, message: "The Private Atelier Registry is temporarily unavailable. Please try again." };
+  }
+
   return {
     success: true,
     receivedAt: new Date().toISOString(),

@@ -6,7 +6,7 @@ interface SEOProps {
   description?: string;
   canonicalPath?: string;
   image?: string;
-  jsonLd?: string | object;
+  jsonLd?: string | object | Array<string | object>;
   type?: "website" | "article" | "product";
 }
 
@@ -74,22 +74,23 @@ export const SEO: React.FC<SEOProps> = ({
     };
 
     updateTwitterTag("twitter:title", fullTitle);
+    updateTwitterTag("twitter:card", "summary_large_image");
     updateTwitterTag("twitter:description", description);
     updateTwitterTag("twitter:image", fullImageUrl);
 
     // 6. JSON-LD Schema
-    const scriptId = "seo-dynamic-jsonld";
-    const existingScript = document.getElementById(scriptId);
-    if (existingScript) {
-      existingScript.remove();
-    }
+    document.querySelectorAll("script[data-seo-dynamic-jsonld]").forEach((script) => script.remove());
 
     if (jsonLd) {
-      const script = document.createElement("script");
-      script.id = scriptId;
-      script.type = "application/ld+json";
-      script.text = typeof jsonLd === "string" ? jsonLd : JSON.stringify(jsonLd);
-      document.head.appendChild(script);
+      const entries = Array.isArray(jsonLd) ? jsonLd : [jsonLd];
+      entries.forEach((entry, index) => {
+        const script = document.createElement("script");
+        script.id = `seo-dynamic-jsonld-${index}`;
+        script.dataset.seoDynamicJsonld = "true";
+        script.type = "application/ld+json";
+        script.text = typeof entry === "string" ? entry : JSON.stringify(entry);
+        document.head.appendChild(script);
+      });
     }
   }, [fullTitle, description, canonicalUrl, fullImageUrl, type, jsonLd]);
 

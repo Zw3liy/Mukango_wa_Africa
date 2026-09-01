@@ -4,6 +4,7 @@ import { SEO } from "../components/common/SEO";
 import { Breadcrumbs } from "../components/common/Breadcrumbs";
 import { Button } from "../components/common/Button";
 import { Clock, User, Calendar, Tag, ArrowLeft } from "lucide-react";
+import { generateArticleJsonLd, generateOrganizationJsonLd } from "../utils/seo";
 
 interface JournalDetailPageProps {
   slug: string;
@@ -36,6 +37,7 @@ export const JournalDetailPage: React.FC<JournalDetailPageProps> = ({ slug, onNa
         canonicalPath={`/journal/${article.slug}`}
         image={article.image}
         type="article"
+        jsonLd={[generateArticleJsonLd(article), generateOrganizationJsonLd()]}
       />
 
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">

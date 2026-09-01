@@ -12,7 +12,7 @@ import { Badge } from "../components/common/Badge";
 import { formatPrice } from "../utils/currency";
 import { useCart } from "../context/CartContext";
 import { useToast } from "../context/ToastContext";
-import { generateProductJsonLd } from "../utils/seo";
+import { generateBreadcrumbsJsonLd, generateOrganizationJsonLd, generateProductJsonLd } from "../utils/seo";
 import { ShoppingBag, ShieldCheck, Clock, Check, Trees, Award } from "lucide-react";
 
 interface ProductDetailPageProps {
@@ -70,7 +70,15 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ slug, onNa
         canonicalPath={`/products/${product.slug}`}
         image={product.images.hero}
         type="product"
-        jsonLd={generateProductJsonLd(product)}
+        jsonLd={[
+          generateProductJsonLd(product),
+          generateBreadcrumbsJsonLd([
+            { name: "Home", path: "/" },
+            { name: "Catalogue", path: "/shop" },
+            { name: product.name, path: `/products/${product.slug}` },
+          ]),
+          generateOrganizationJsonLd(),
+        ]}
       />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
