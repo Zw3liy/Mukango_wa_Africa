@@ -154,7 +154,7 @@ export async function handleBespokeFormSubmission(
     <p><strong>Delivery Destination:</strong> ${country}</p>
     <p><strong>Piece Type:</strong> ${pieceType}</p>
     <p><strong>Preferred Timber:</strong> ${preferredTimber || "Artisan Recommendation"}</p>
-    <p><strong>Budget Range:</strong> ${rawInput.budgetRangeUsd || "Flexible"}</p>
+    <p><strong>Budget Range (ZAR):</strong> ${rawInput.budgetRangeZar || "Flexible"}</p>
     <p><strong>Space / Setting:</strong> ${rawInput.intendedSpace || "Residential"}</p>
     <p><strong>Project Vision & Requirements:</strong></p>
     <blockquote>${description}</blockquote>
